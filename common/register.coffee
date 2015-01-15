@@ -1,6 +1,7 @@
 ReactionCore.registerPackage
   name: "reaction-braintree"
   provides: ['paymentMethod']
+  paymentTemplate: "braintreePaymentForm"
   label: "Braintree"
   description: "Braintree Payment for Reaction Commerce"
   icon: 'fa fa-shopping-cart'

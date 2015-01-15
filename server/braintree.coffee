@@ -4,7 +4,8 @@ Future = Npm.require("fibers/future")
 
 braintreePackage = ReactionCore.Collections.Packages.findOne(name: "reaction-braintree")
 
-if braintreePackage
+if braintreePackage?.settings
+  ReactionCore.Events.trace {name: "reactioncommerce:reaction-braintree", settings: braintreePackage}
   settings = braintreePackage.settings
   gateway = Braintree.connect(
     environment: Braintree.Environment.Sandbox
