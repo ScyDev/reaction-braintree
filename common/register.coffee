@@ -6,7 +6,7 @@ ReactionCore.registerPackage
   description: "Braintree Payment for Reaction Commerce"
   icon: 'fa fa-shopping-cart'
   settingsRoute: "braintree"
-  hasWidget: false
+  hasWidget: true
   priority: "2"
   shopPermissions: [
     {
