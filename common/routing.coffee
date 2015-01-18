@@ -4,4 +4,4 @@ Router.map ->
     path: 'dashboard/settings/braintree',
     template: 'braintree'
     waitOn: ->
-      PackagesHandle
+      return ReactionCore.Subscriptions.Packages

@@ -1,11 +1,12 @@
-Meteor.app.packages.register(
+ReactionCore.registerPackage
   name: "reaction-braintree"
   provides: ['paymentMethod']
+  paymentTemplate: "braintreePaymentForm"
   label: "Braintree"
   description: "Braintree Payment for Reaction Commerce"
-  icon: "fa fa-globe"
+  icon: 'fa fa-shopping-cart'
   settingsRoute: "braintree"
-  hasWidget: false
+  hasWidget: true
   priority: "2"
   shopPermissions: [
     {
@@ -14,4 +15,3 @@ Meteor.app.packages.register(
       group: "Shop Settings"
     }
   ]
-)

@@ -2,21 +2,23 @@ Braintree = Npm.require('braintree')
 Fiber = Npm.require("fibers")
 Future = Npm.require("fibers/future")
 
-settings = Packages.findOne(name: "reaction-braintree").settings
+braintreePackage = ReactionCore.Collections.Packages.findOne(name: "reaction-braintree")
 
-gateway = Braintree.connect(
-  environment: Braintree.Environment.Sandbox
-  merchantId: settings.merchant_id
-  publicKey: settings.public_key
-  privateKey: settings.private_key
-)
+if braintreePackage?.settings
+  ReactionCore.Events.trace {name: "reactioncommerce:reaction-braintree", settings: braintreePackage}
+  settings = braintreePackage.settings
+  gateway = Braintree.connect(
+    environment: Braintree.Environment.Sandbox
+    merchantId: settings.merchant_id
+    publicKey: settings.public_key
+    privateKey: settings.private_key
+  )
 
 Meteor.methods
-
   braintreeSubmit: (cardData, amount) ->
     fut = new Future()
     @unblock()
-    
+
     gateway.transaction.sale
       amount: amount
       creditCard:

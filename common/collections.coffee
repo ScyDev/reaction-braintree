@@ -1,22 +1,21 @@
-@BraintreePackageSchema = new SimpleSchema([
-  PackageConfigSchema
+ReactionCore.Schemas.BraintreePackageConfig  = new SimpleSchema([
+  ReactionCore.Schemas.PackageConfig
   {
     "settings.merchant_id":
       type: String
       label: "Merchant ID"
-  
+
     "settings.public_key":
       type: String
       label: "Public Key"
-  
+
     "settings.private_key":
       type: String
       label: "Private Key"
   }
 ])
-BraintreePackageSchema = @BraintreePackageSchema
 
-@BraintreePaymentSchema = new SimpleSchema
+ReactionCore.Schemas.BraintreePayment = new SimpleSchema
   payerName:
     type: String
     label: "Cardholder name",
@@ -38,24 +37,5 @@ BraintreePackageSchema = @BraintreePackageSchema
     max: 4
     label: "CVV"
 
-BraintreePaymentSchema = @BraintreePaymentSchema
-
-BraintreePaymentSchema.messages
+ReactionCore.Schemas.BraintreePayment.messages
   "regEx payerName": "[label] must include both first and last name"
-
-###
-# Fixture - we always want a record
-###
-Meteor.startup ->
-  unless Packages.findOne({name:"reaction-braintree"})
-    Shops.find().forEach (shop) ->
-      unless Meteor.settings.braintree
-        Meteor.settings.braintree =
-          merchant_id: ""
-          public_key: ""
-          private_key: ""
-
-      Packages.insert
-        shopId: shop._id
-        name: "reaction-braintree"
-        settings: Meteor.settings.braintree

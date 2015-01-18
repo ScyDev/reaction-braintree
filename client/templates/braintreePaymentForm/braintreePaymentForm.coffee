@@ -33,7 +33,7 @@ handleBraintreeSubmitError = (error) -> #Paypal Error Handling
   else if serverError
     paymentAlert("Oops! " + serverError)
 
-Template.braintreetest.helpers
+Template.braintreePaymentForm.helpers
   monthOptions: () ->
     monthOptions =
       [
@@ -71,7 +71,7 @@ AutoForm.addHooks "braintree-payment-form",
     template = this.template
     hidePaymentAlert()
 
-    
+
     cardData = {
       name: doc.payerName
       number: doc.cardNumber
@@ -88,14 +88,14 @@ AutoForm.addHooks "braintree-payment-form",
     # which currency the transaction is processed with.
     # Check this link for more info:
     # https://developers.braintreepayments.com/ios+ruby/sdk/server/transaction-processing/create
-    
+
     # Reaction only stores type and 4 digits
     storedCard = getCardType(doc.cardNumber).charAt(0).toUpperCase() + getCardType(doc.cardNumber).slice(1) + " " + doc.cardNumber.slice(-4)
 
     # Order Layout
     $(".list-group a").css("text-decoration", "none")
     $(".list-group-item").removeClass("list-group-item")
-    
+
     Meteor.call "braintreeSubmit", cardData, amount
     , (error, transaction) ->
       submitting = false
@@ -108,7 +108,7 @@ AutoForm.addHooks "braintree-payment-form",
       else
         if transaction.saved is true #successful transaction
 
-          # This is where we need to decide how much of the Braintree  
+          # This is where we need to decide how much of the Braintree
           # response object we need to pass to CartWorkflow
           paymentMethod =
             processor: "Braintree"
