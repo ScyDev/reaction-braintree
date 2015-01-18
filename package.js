@@ -9,7 +9,7 @@ Npm.depends({'braintree': '1.15.0'});
 
 Package.onUse(function (api, where) {
   api.versionsFrom('METEOR@1.0');
-  api.use("meteor-platform");
+  api.use("meteor-platform@1.2.1");
   api.use("coffeescript");
   api.use("less");
   api.use("reactioncommerce:core@0.2.2");
