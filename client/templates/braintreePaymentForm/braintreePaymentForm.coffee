@@ -20,18 +20,19 @@ paymentAlert = (errorMessage) ->
 hidePaymentAlert = () ->
   $(".alert").addClass("hidden").text('')
 
-handleBraintreeSubmitError = (error) -> #Paypal Error Handling
-  singleError = error?.response?.error_description
-  serverError = error?.response?.message
-  errors = error?.response?.details || []
-  if singleError
-    paymentAlert("Oops! " + singleError)
-  else if errors.length
-    for error in errors
-      formattedError = "Oops! " + error.issue + ": " + error.field.split(/[. ]+/).pop().replace(/_/g,' ')
-      paymentAlert(formattedError)
-  else if serverError
-    paymentAlert("Oops! " + serverError)
+handleBraintreeSubmitError = (error) -> #Braintree Error Handling
+  console.log error
+  # singleError = error?.response?.error_description
+  # serverError = error?.response?.message
+  # errors = error?.response?.details || []
+  # if singleError
+  #   paymentAlert("Oops! " + singleError)
+  # else if errors.length
+  #   for error in errors
+  #     formattedError = "Oops! " + error.issue + ": " + error.field.split(/[. ]+/).pop().replace(/_/g,' ')
+  #     paymentAlert(formattedError)
+  # else if serverError
+  #   paymentAlert("Oops! " + serverError)
 
 Template.braintreePaymentForm.helpers
   monthOptions: () ->
@@ -107,17 +108,16 @@ AutoForm.addHooks "braintree-payment-form",
         return
       else
         if transaction.saved is true #successful transaction
-
           # This is where we need to decide how much of the Braintree
           # response object we need to pass to CartWorkflow
           paymentMethod =
             processor: "Braintree"
             storedCard: storedCard
-            method: transaction.payment.payer.payment_method
-            transactionId: transaction.payment.id
-            amount: transaction.payment.amount
-            status: transaction.payment.state
-            mode: transaction.payment.intent
+            method: transaction.payment.transaction.creditCard.cardType
+            transactionId: transaction.payment.transaction.id
+            amount: transaction.payment.transaction.amount
+            status: transaction.payment.transaction.status
+            mode: transaction.payment.transaction.type
             createdAt: new Date(transaction.payment.create_time)
             updatedAt: new Date(transaction.payment.update_time)
 

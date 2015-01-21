@@ -39,11 +39,4 @@ Meteor.methods
           console.log result.message
         return
 
-        ### Error handling Snippet from braintree docs
-        throw err if err
-        if result.success
-          console.log "Success. Transaction ID: " + result.transaction.id
-        else
-          console.log result.message
-        return
-        ###
+    fut.wait()
