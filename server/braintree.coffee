@@ -36,7 +36,7 @@ Meteor.methods
             saved: true
             payment: payment
         else
-          console.log result.message
+          ReactionCore.Events.info result.message
         return
 
     fut.wait()
