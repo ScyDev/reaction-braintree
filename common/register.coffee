@@ -3,14 +3,19 @@ ReactionCore.registerPackage
   provides: ['paymentMethod']
   paymentTemplate: "braintreePaymentForm"
   label: "Braintree"
-  description: "Braintree Payment for Reaction Commerce"
+  description: "Accept Braintree"
   icon: 'fa fa-shopping-cart'
   settingsRoute: "braintree"
+  defaultSettings:
+    mode: false
+    merchant_id: ""
+    public_key: ""
+    private_key: ""
+  priority: '2'
   hasWidget: true
-  priority: "2"
   shopPermissions: [
     {
-      label: "Braintree Payments"
+      label: "Braintree"
       permission: "dashboard/payments"
       group: "Shop Settings"
     }
