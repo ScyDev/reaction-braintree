@@ -2,17 +2,16 @@ Braintree = Npm.require('braintree')
 Fiber = Npm.require("fibers")
 Future = Npm.require("fibers/future")
 
-accountOptions = Meteor.Braintree.accountOptions()
-if accountOptions.environment is "production"
-  accountOptions.environment = Braintree.Environment.Production
-else
-  accountOptions.environment = Braintree.Environment.Sandbox
-
-gateway = Braintree.connect accountOptions
-
 Meteor.methods
   #submit (sale, authorize)
   braintreeSubmit: (transactionType, cardData, paymentData) ->
+    accountOptions = Meteor.Braintree.accountOptions()
+    if accountOptions.environment is "production"
+      accountOptions.environment = Braintree.Environment.Production
+    else
+      accountOptions.environment = Braintree.Environment.Sandbox
+
+    gateway = Braintree.connect accountOptions
 
     paymentObj = Meteor.Braintree.paymentObj()
     if transactionType is "authorize" then paymentObj.options.submitForSettlement = true
@@ -40,7 +39,13 @@ Meteor.methods
 
   # capture (existing authorization)
   braintreeCapture: (transactionId, captureDetails) ->
-    Braintree.configure Meteor.Braintree.accountOptions()
+    accountOptions = Meteor.Braintree.accountOptions()
+    if accountOptions.environment is "production"
+      accountOptions.environment = Braintree.Environment.Production
+    else
+      accountOptions.environment = Braintree.Environment.Sandbox
+
+    gateway = Braintree.connect accountOptions
 
     fut = new Future()
     @unblock()

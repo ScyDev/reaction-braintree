@@ -3,7 +3,7 @@ ReactionCore.registerPackage
   provides: ['paymentMethod']
   paymentTemplate: "braintreePaymentForm"
   label: "Braintree"
-  description: "Stripe Payment for Reaction Commerce"
+  description: "Braintree Payment for Reaction Commerce"
   icon: 'fa fa-credit-card'
   settingsRoute: "braintree"
   defaultSettings:
@@ -11,8 +11,9 @@ ReactionCore.registerPackage
     merchant_id: ""
     public_key: ""
     private_key: ""
-  priority: '2'
+  priority: "2"
   hasWidget: true
+  autoEnable: false
   shopPermissions: [
     {
       label: "Braintree"
