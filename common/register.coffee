@@ -3,8 +3,8 @@ ReactionCore.registerPackage
   provides: ['paymentMethod']
   paymentTemplate: "braintreePaymentForm"
   label: "Braintree"
-  description: "Accept Braintree"
-  icon: 'fa fa-shopping-cart'
+  description: "Stripe Payment for Reaction Commerce"
+  icon: 'fa fa-credit-card'
   settingsRoute: "braintree"
   defaultSettings:
     mode: false
