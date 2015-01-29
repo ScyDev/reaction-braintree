@@ -93,7 +93,7 @@ AutoForm.addHooks "braintree-payment-form",
       currency: Shops.findOne().currency
     , (error, transaction) ->
       submitting = false
-      console.log error, transaction
+
       if error
         # this only catches connection/authentication errors
         handleBraintreeSubmitError(error)
@@ -103,7 +103,7 @@ AutoForm.addHooks "braintree-payment-form",
       else
         if transaction.saved is true #successful transaction
 
-          braintreeStatus = transaction.transactionResponse.transaction.status
+          braintreeStatus = transaction.response.transaction.status
 
           # Normalize status
           normalizedStatus = switch braintreeStatus
@@ -135,14 +135,14 @@ AutoForm.addHooks "braintree-payment-form",
           paymentMethod =
             processor: "Braintree"
             storedCard: storedCard
-            method: transaction.transactionResponse.transaction.creditCard.cardType
-            transactionId: transaction.transactionResponse.transaction.id
-            amount: transaction.transactionResponse.transaction.amount
+            method: transaction.response.transaction.creditCard.cardType
+            transactionId: transaction.response.transaction.id
+            amount: transaction.response.transaction.amount
             status: normalizedStatus
             mode: normalizedMode
-            createdAt: new Date(transaction.transactionResponse.create_time)
-            updatedAt: new Date(transaction.transactionResponse.update_time)
-            transactions: transaction.transactionResponse
+            createdAt: new Date(transaction.response.create_time)
+            updatedAt: new Date(transaction.response.update_time)
+            transactions: transaction.response
 
           # Store transaction information with order
           # paymentMethod will auto transition to
@@ -152,7 +152,7 @@ AutoForm.addHooks "braintree-payment-form",
           CartWorkflow.paymentMethod(paymentMethod)
           return
         else # card errors are returned in transaction
-          handleBraintreeSubmitError(transaction.transactionResponse.message)
+          handleBraintreeSubmitError(transaction.response.message)
           # Hide processing UI
           uiEnd(template, "Resubmit payment")
           return

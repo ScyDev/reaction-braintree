@@ -29,11 +29,11 @@ Meteor.methods
       else if not result.success
         fut.return
           saved: false
-          transactionResponse: result
+          response: result
       else
         fut.return
           saved: true
-          transactionResponse: result
+          response: result
       return
     , (e) ->
       ReactionCore.Events.warn e
@@ -61,7 +61,7 @@ Meteor.methods
       else
         fut.return
           saved: true
-          transactionResponse: result
+          response: result
       return
     , (e) ->
       ReactionCore.Events.warn e
