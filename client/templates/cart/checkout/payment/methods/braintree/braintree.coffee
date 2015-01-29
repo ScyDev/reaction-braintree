@@ -21,26 +21,26 @@ hidePaymentAlert = () ->
   $(".alert").addClass("hidden").text('')
 
 handleBraintreeSubmitError = (error) ->
+  # TODO - this error handling needs to be reworked for the Braintree API
   console.log error
   # Depending on what they are, errors come back from Braintree in various formats
-  singleError = error?.response?.error_description
-  serverError = error?.response?.message
-  errors = error?.response?.details || []
-  if singleError
-    paymentAlert("Oops! " + singleError)
-  else if errors.length
-    for error in errors
-      formattedError = "Oops! " + error.issue + ": " + error.field.split(/[. ]+/).pop().replace(/_/g,' ')
-      paymentAlert(formattedError)
-  else if serverError
-    paymentAlert("Oops! " + serverError)
+  # singleError = error?.response?.error_description
+  # serverError = error?.response?.message
+  # errors = error?.response?.details || []
+  # if singleError
+  #   paymentAlert("Oops! " + singleError)
+  # else if errors.length
+  #   for error in errors
+  #     formattedError = "Oops! " + error.issue + ": " + error.field.split(/[. ]+/).pop().replace(/_/g,' ')
+  #     paymentAlert(formattedError)
+  # else if serverError
+  #   paymentAlert("Oops! " + serverError)
 
 
 Template.braintreePaymentForm.helpers
   monthOptions: () ->
     monthOptions =
       [
-        { value: "", label: "Choose month"}
         { value: "01", label: "1 - January"}
         { value: "02", label: "2 - February" }
         { value: "03", label: "3 - March" }
@@ -57,7 +57,7 @@ Template.braintreePaymentForm.helpers
     monthOptions
 
   yearOptions: () ->
-    yearOptions = [{ value: "", label: "Choose year" }]
+    yearOptions = []
     year = new Date().getFullYear()
     for x in [1...9] by 1
       yearOptions.push { value: year , label: year}
@@ -70,7 +70,6 @@ submitting = false
 AutoForm.addHooks "braintree-payment-form",
   onSubmit: (doc) ->
     # Process form (pre-validated by autoform)
-
     submitting = true
     template = this.template
     hidePaymentAlert()
@@ -79,8 +78,8 @@ AutoForm.addHooks "braintree-payment-form",
     form = {
       name: doc.payerName
       number: doc.cardNumber
-      expire_month: doc.expireMonth
-      expire_year: doc.expireYear
+      expirationMonth: doc.expireMonth
+      expirationYear: doc.expireYear
       cvv2: doc.cvv
       type: getCardType(doc.cardNumber)
     }
@@ -94,6 +93,7 @@ AutoForm.addHooks "braintree-payment-form",
       currency: Shops.findOne().currency
     , (error, transaction) ->
       submitting = false
+      console.log error, transaction
       if error
         # this only catches connection/authentication errors
         handleBraintreeSubmitError(error)
@@ -103,8 +103,9 @@ AutoForm.addHooks "braintree-payment-form",
       else
         if transaction.saved is true #successful transaction
 
+          braintreeStatus = transaction.transactionResponse.transaction.status
+
           # Normalize status
-          braintreeStatus = transaction.payment.transaction.status
           normalizedStatus = switch braintreeStatus
             when "authorization_expired" then "expired"
             when "authorized" then "created"
@@ -122,25 +123,26 @@ AutoForm.addHooks "braintree-payment-form",
             else "failed"
 
           # Normalize mode
-          braintreeType = transaction.payment.transaction.type
-          normalizedMode = switch
-            when braintreeType is "sale" then "sale"
-            when braintreeStatus is "authorized" or "authorizing" then "authorization"
-            #when _ is _ then "order"
-            else "sale"
+          normalizedMode = switch braintreeStatus
+            when "settled" then "capture"
+            when "settling" then "capture"
+            when "submitted_for_settlement" then "capture"
+            when "settlement_confirmed" then "capture"
+            when "authorized" or "authorizing" then "authorize"
+            else "capture"
 
           # Response object to pass to CartWorkflow
           paymentMethod =
             processor: "Braintree"
             storedCard: storedCard
-            method: transaction.payment.transaction.creditCard.cardType
-            transactionId: transaction.payment.transaction.id
-            amount: transaction.payment.transaction.amount
+            method: transaction.transactionResponse.transaction.creditCard.cardType
+            transactionId: transaction.transactionResponse.transaction.id
+            amount: transaction.transactionResponse.transaction.amount
             status: normalizedStatus
             mode: normalizedMode
-            createdAt: new Date(transaction.payment.create_time)
-            updatedAt: new Date(transaction.payment.update_time)
-            transactions: transaction.payment
+            createdAt: new Date(transaction.transactionResponse.create_time)
+            updatedAt: new Date(transaction.transactionResponse.update_time)
+            transactions: transaction.transactionResponse
 
           # Store transaction information with order
           # paymentMethod will auto transition to
@@ -150,7 +152,7 @@ AutoForm.addHooks "braintree-payment-form",
           CartWorkflow.paymentMethod(paymentMethod)
           return
         else # card errors are returned in transaction
-          handleBraintreeSubmitError(transaction.error)
+          handleBraintreeSubmitError(transaction.transactionResponse.message)
           # Hide processing UI
           uiEnd(template, "Resubmit payment")
           return

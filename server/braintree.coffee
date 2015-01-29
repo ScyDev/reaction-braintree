@@ -14,22 +14,26 @@ Meteor.methods
     gateway = Braintree.connect accountOptions
 
     paymentObj = Meteor.Braintree.paymentObj()
-    if transactionType is "authorize" then paymentObj.options.submitForSettlement = true
+    if transactionType is "authorize" then paymentObj.options.submitForSettlement = false
     paymentObj.creditCard = Meteor.Braintree.parseCardData(cardData)
-    paymentObj.amount = Meteor.Braintree.parsePaymentData(paymentData)
+    paymentObj.amount = paymentData.total
 
     fut = new Future()
     @unblock()
 
-    gateway.transaction.sale paymentObj, Meteor.bindEnvironment((err, payment) ->
-      if err
+    gateway.transaction.sale paymentObj, Meteor.bindEnvironment((error, result) ->
+      if error
         fut.return
           saved: false
           error: err
+      else if not result.success
+        fut.return
+          saved: false
+          transactionResponse: result
       else
         fut.return
           saved: true
-          payment: payment
+          transactionResponse: result
       return
     , (e) ->
       ReactionCore.Events.warn e
@@ -49,7 +53,7 @@ Meteor.methods
 
     fut = new Future()
     @unblock()
-    Braintree.authorization.capture transactionId, captureDetails, (error, capture) ->
+    gateway.transaction.submit_for_settlement transactionId, captureDetails, Meteor.bindEnvironment((error, result) ->
       if error
         fut.return
           saved: false
@@ -57,45 +61,10 @@ Meteor.methods
       else
         fut.return
           saved: true
-          capture: capture
+          transactionResponse: result
       return
+    , (e) ->
+      ReactionCore.Events.warn e
+      return
+    )
     fut.wait()
-
-
-# braintreePackage = ReactionCore.Collections.Packages.findOne(name: "reaction-braintree")
-#
-# if braintreePackage?.settings
-#   ReactionCore.Events.trace {name: "reactioncommerce:reaction-braintree", settings: braintreePackage}
-#   settings = braintreePackage.settings
-#   gateway = Braintree.connect(
-#     environment: Braintree.Environment.Sandbox
-#     merchantId: settings.merchant_id
-#     publicKey: settings.public_key
-#     privateKey: settings.private_key
-#   )
-#
-# Meteor.methods
-#   braintreeSubmit: (cardData, amount) ->
-#     fut = new Future()
-#
-#     gateway.transaction.sale
-#       amount: amount
-#       creditCard:
-#         number: cardData.number
-#         expirationMonth: cardData.expirationMonth
-#         expirationYear: cardData.expirationYear
-#         cvv: cardData.cvv
-#       , (err, payment) ->
-#         if err
-#           fut.return
-#             saved: false
-#             error: err
-#         else if payment.success
-#           fut.return
-#             saved: true
-#             payment: payment
-#         else
-#           console.log result.message
-#         return
-#
-#     fut.wait()

@@ -10,19 +10,15 @@ Meteor.Braintree =
     return options
 
   #authorize submits a payment authorization to Braintree
-  authorize: (cardInfo, paymentInfo, callback) ->
-    Meteor.call "braintreeSubmit", "authorize", cardInfo, paymentInfo, callback
+  authorize: (cardData, paymentData, callback) ->
+    Meteor.call "braintreeSubmit", "authorize", cardData, paymentData, callback
     return
 
-  # purchase: function(card_info, payment_info, callback){
-  #   Meteor.call('braintreeSubmit', 'sale', card_info, payment_info, callback);
-  # },
+  # TODO - add a "charge" function that creates a new charge and captures all at once
+
   capture: (transactionId, amount, callback) ->
     captureDetails =
-      amount:
-        currency: "USD"
-        total: amount
-      is_final_capture: true
+      amount: amount
 
     Meteor.call "braintreeCapture", transactionId, captureDetails, callback
     return
@@ -34,7 +30,6 @@ Meteor.Braintree =
 
   paymentObj: ->
     amount: ""
-    transactions: []
     options:
       submitForSettlement: true
 
@@ -45,10 +40,6 @@ Meteor.Braintree =
     expirationMonth: data.expirationMonth
     expirationYear: data.expirationYear
     cvv: data.cvv
-
-  #parsePaymentData splits up the card data and gets it into a braintree friendly format.
-  parsePaymentData: (data) ->
-    amount: data.total
 
   # This needs work to support multi currency
   # Braintree uses merchant ids that must be preconfigured for each currency
