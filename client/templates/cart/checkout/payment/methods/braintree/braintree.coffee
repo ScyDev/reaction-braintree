@@ -142,7 +142,8 @@ AutoForm.addHooks "braintree-payment-form",
             mode: normalizedMode
             createdAt: new Date(transaction.response.create_time)
             updatedAt: new Date(transaction.response.update_time)
-            transactions: transaction.response
+            transactions: []
+          paymentMethod.transactions.push transaction.response
 
           # Store transaction information with order
           # paymentMethod will auto transition to
