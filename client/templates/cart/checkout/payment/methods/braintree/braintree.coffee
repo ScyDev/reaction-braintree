@@ -103,10 +103,8 @@ AutoForm.addHooks "braintree-payment-form",
       else
         if transaction.saved is true #successful transaction
 
-          braintreeStatus = transaction.response.transaction.status
-
           # Normalize status
-          normalizedStatus = switch braintreeStatus
+          normalizedStatus = switch transaction.response.transaction.status
             when "authorization_expired" then "expired"
             when "authorized" then "created"
             when "authorizing" then "pending"
@@ -123,7 +121,7 @@ AutoForm.addHooks "braintree-payment-form",
             else "failed"
 
           # Normalize mode
-          normalizedMode = switch braintreeStatus
+          normalizedMode = switch transaction.response.transaction.status
             when "settled" then "capture"
             when "settling" then "capture"
             when "submitted_for_settlement" then "capture"
