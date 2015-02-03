@@ -2,48 +2,69 @@ Braintree = Npm.require('braintree')
 Fiber = Npm.require("fibers")
 Future = Npm.require("fibers/future")
 
-braintreePackage = ReactionCore.Collections.Packages.findOne(name: "reaction-braintree")
-
-if braintreePackage?.settings
-  ReactionCore.Events.trace {name: "reactioncommerce:reaction-braintree", settings: braintreePackage}
-  settings = braintreePackage.settings
-  gateway = Braintree.connect(
-    environment: Braintree.Environment.Sandbox
-    merchantId: settings.merchant_id
-    publicKey: settings.public_key
-    privateKey: settings.private_key
-  )
-
 Meteor.methods
-  braintreeSubmit: (cardData, amount) ->
+  #submit (sale, authorize)
+  braintreeSubmit: (transactionType, cardData, paymentData) ->
+    accountOptions = Meteor.Braintree.accountOptions()
+    if accountOptions.environment is "production"
+      accountOptions.environment = Braintree.Environment.Production
+    else
+      accountOptions.environment = Braintree.Environment.Sandbox
+
+    gateway = Braintree.connect accountOptions
+
+    paymentObj = Meteor.Braintree.paymentObj()
+    if transactionType is "authorize" then paymentObj.options.submitForSettlement = false
+    paymentObj.creditCard = Meteor.Braintree.parseCardData(cardData)
+    paymentObj.amount = paymentData.total
+
     fut = new Future()
     @unblock()
 
-    gateway.transaction.sale
-      amount: amount
-      creditCard:
-        number: cardData.number
-        expirationMonth: cardData.expirationMonth
-        expirationYear: cardData.expirationYear
-        cvv: cardData.cvv
-      , (err, payment) ->
-        if err
-          fut.return
-            saved: false
-            error: err
-        else if payment.success
-          fut.return
-            saved: true
-            payment: payment
-        else
-          console.log result.message
-        return
+    gateway.transaction.sale paymentObj, Meteor.bindEnvironment((error, result) ->
+      if error
+        fut.return
+          saved: false
+          error: err
+      else if not result.success
+        fut.return
+          saved: false
+          response: result
+      else
+        fut.return
+          saved: true
+          response: result
+      return
+    , (e) ->
+      ReactionCore.Events.warn e
+      return
+    )
+    fut.wait()
 
-        ### Error handling Snippet from braintree docs
-        throw err if err
-        if result.success
-          console.log "Success. Transaction ID: " + result.transaction.id
-        else
-          console.log result.message
-        return
-        ###
+  # capture (existing authorization)
+  braintreeCapture: (transactionId, captureDetails) ->
+    accountOptions = Meteor.Braintree.accountOptions()
+    if accountOptions.environment is "production"
+      accountOptions.environment = Braintree.Environment.Production
+    else
+      accountOptions.environment = Braintree.Environment.Sandbox
+
+    gateway = Braintree.connect accountOptions
+
+    fut = new Future()
+    @unblock()
+    gateway.transaction.submit_for_settlement transactionId, captureDetails, Meteor.bindEnvironment((error, result) ->
+      if error
+        fut.return
+          saved: false
+          error: error
+      else
+        fut.return
+          saved: true
+          response: result
+      return
+    , (e) ->
+      ReactionCore.Events.warn e
+      return
+    )
+    fut.wait()

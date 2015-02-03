@@ -1,7 +1,7 @@
 Package.describe({
-  summary: "Reaction Braintree - Braintree Payment Module for Reaction commerce",
+  summary: "Reaction Braintree - Braintree payments for Reaction Commerce",
   name: "reactioncommerce:reaction-braintree",
-  version: "1.0.0",
+  version: "0.1.0",
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
@@ -14,14 +14,21 @@ Package.onUse(function (api, where) {
   api.use("less");
   api.use("reactioncommerce:core@0.2.2");
 
-  api.add_files("common/collections.coffee",["client","server"]);
-  api.add_files("common/routing.coffee",["client","server"]);
-  api.add_files("common/register.coffee",["client","server"]);
+  api.add_files([
+    "common/register.coffee",
+    "common/collections.coffee",
+    "lib/braintree.coffee"
+  ],["client","server"]);
   api.add_files("server/braintree.coffee",["server"]);
   api.add_files([
+    "client/routing.coffee",
     "client/templates/braintree.html",
+    "client/templates/braintree.less",
     "client/templates/braintree.coffee",
-    "client/templates/braintreePaymentForm/braintreePaymentForm.html",
-    "client/templates/braintreePaymentForm/braintreePaymentForm.coffee"
-  ], ["client"]);
+    "client/templates/cart/checkout/payment/methods/braintree/braintree.html",
+    "client/templates/cart/checkout/payment/methods/braintree/braintree.less",
+    "client/templates/cart/checkout/payment/methods/braintree/braintree.coffee"
+  ],
+  ["client"]);
+  
 });
