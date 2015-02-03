@@ -89,7 +89,7 @@ AutoForm.addHooks "braintree-payment-form",
 
     # Submit for processing
     Meteor.Braintree.authorize form,
-      total: Session.get "cartTotal"
+      total: ReactionCore.Collections.Cart.findOne().cartTotal()
       currency: Shops.findOne().currency
     , (error, transaction) ->
       submitting = false
