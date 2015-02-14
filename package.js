@@ -1,7 +1,7 @@
 Package.describe({
   summary: "Reaction Braintree - Braintree payments for Reaction Commerce",
   name: "reactioncommerce:reaction-braintree",
-  version: "0.2.0",
+  version: "1.1.0",
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
@@ -14,14 +14,16 @@ Package.onUse(function (api, where) {
   api.use("less");
   api.use("reactioncommerce:core@0.3.0");
 
+  api.add_files("server/register.coffee",["server"]); // register as a reaction package
+  api.add_files("server/braintree.coffee",["server"]);
+
   api.add_files([
-    "common/register.coffee",
     "common/collections.coffee",
+    "common/routing.coffee",
     "lib/braintree.coffee"
   ],["client","server"]);
-  api.add_files("server/braintree.coffee",["server"]);
+
   api.add_files([
-    "client/routing.coffee",
     "client/templates/braintree.html",
     "client/templates/braintree.less",
     "client/templates/braintree.coffee",
