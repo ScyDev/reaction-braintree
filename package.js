@@ -12,18 +12,18 @@ Package.onUse(function (api, where) {
   api.use("meteor-platform@1.2.1");
   api.use("coffeescript");
   api.use("less");
-  api.use("reactioncommerce:core@0.3.0");
+  api.use("reactioncommerce:core@0.4.1");
 
-  api.add_files("server/register.coffee",["server"]); // register as a reaction package
-  api.add_files("server/braintree.coffee",["server"]);
+  api.addFiles("server/register.coffee",["server"]); // register as a reaction package
+  api.addFiles("server/braintree.coffee",["server"]);
 
-  api.add_files([
+  api.addFiles([
     "common/collections.coffee",
     "common/routing.coffee",
     "lib/braintree.coffee"
   ],["client","server"]);
 
-  api.add_files([
+  api.addFiles([
     "client/templates/braintree.html",
     "client/templates/braintree.less",
     "client/templates/braintree.coffee",
