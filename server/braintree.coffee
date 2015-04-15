@@ -5,6 +5,17 @@ Future = Npm.require("fibers/future")
 Meteor.methods
   #submit (sale, authorize)
   braintreeSubmit: (transactionType, cardData, paymentData) ->
+    check transactionType, String
+    check cardData,
+      name: String
+      number: String
+      expirationMonth: String
+      expirationYear: String
+      cvv2: String
+      type: String
+    check paymentData,
+      total: String
+      currency: String
     accountOptions = Meteor.Braintree.accountOptions()
     if accountOptions.environment is "production"
       accountOptions.environment = Braintree.Environment.Production
@@ -43,6 +54,9 @@ Meteor.methods
 
   # capture (existing authorization)
   braintreeCapture: (transactionId, captureDetails) ->
+    check transactionId, String
+    check captureDetails,
+      amount: Number
     accountOptions = Meteor.Braintree.accountOptions()
     if accountOptions.environment is "production"
       accountOptions.environment = Braintree.Environment.Production
