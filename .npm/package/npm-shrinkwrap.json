@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "braintree": {
-      "version": "1.15.0",
+      "version": "1.23.0",
       "dependencies": {
         "dateformat": {
           "version": "1.0.1-1.2.3"
@@ -16,7 +16,7 @@
               "version": "1.0.1"
             },
             "string_decoder": {
-              "version": "0.10.25-1"
+              "version": "0.10.31"
             },
             "debuglog": {
               "version": "0.0.2"
@@ -30,7 +30,7 @@
           "version": "0.1.13",
           "dependencies": {
             "sax": {
-              "version": "0.6.0"
+              "version": "0.6.1"
             }
           }
         },
