@@ -4,9 +4,10 @@ Meteor.Braintree =
     if settings?.mode is true then environment = "production" else environment = "sandbox"
     options =
       environment: environment
-      merchantId: settings?.merchant_id || Meteor.settings.braintree.merchant_id
-      publicKey: settings?.public_key || Meteor.settings.braintree.public_key
-      privateKey: settings?.private_key || Meteor.settings.braintree.private_key
+      merchantId: settings?.merchant_id || Meteor.settings.braintree?.merchant_id
+      publicKey: settings?.public_key || Meteor.settings.braintree?.public_key
+      privateKey: settings?.private_key || Meteor.settings.braintree?.private_key
+    unless options.merchantId then throw new Meteor.Error 403, "Invalid Braintree Credentials"
     return options
 
   #authorize submits a payment authorization to Braintree
