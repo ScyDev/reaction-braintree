@@ -1,18 +1,18 @@
 Package.describe({
   summary: "Reaction Braintree - Braintree payments for Reaction Commerce",
   name: "reactioncommerce:reaction-braintree",
-  version: "1.2.0",
+  version: "1.3.0",
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
-Npm.depends({'braintree': '1.23.0'});
+Npm.depends({'braintree': '1.27.0'});
 
 Package.onUse(function (api, where) {
   api.versionsFrom('METEOR@1.0');
   api.use("meteor-platform@1.2.2");
   api.use("coffeescript");
   api.use("less");
-  api.use("reactioncommerce:core@0.5.7");
+  api.use("reactioncommerce:core@0.6.1");
 
   api.addFiles("server/register.coffee",["server"]); // register as a reaction package
   api.addFiles("server/braintree.coffee",["server"]);
