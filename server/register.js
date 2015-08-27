@@ -16,9 +16,12 @@ ReactionCore.registerPackage({
       cycle: '3',
       container: 'dashboard'
     }, {
+      label: "Braintree Settings",
+      i18nLabel: "app.braintreeSettings",
       route: 'braintree',
       provides: 'settings',
-      container: 'dashboard'
+      container: 'dashboard',
+      template: 'braintreeSettings'
     }, {
       template: 'braintreePaymentForm',
       provides: 'paymentMethod'

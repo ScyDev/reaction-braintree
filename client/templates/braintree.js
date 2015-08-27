@@ -1,4 +1,4 @@
-Template.braintree.helpers({
+Template.braintreeSettings.helpers({
   packageData: function() {
     return ReactionCore.Collections.Packages.findOne({
       name: "reaction-braintree"
