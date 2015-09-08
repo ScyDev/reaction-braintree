@@ -6,6 +6,15 @@ Template.braintreeSettings.helpers({
   }
 });
 
+
+Template.braintreeSettings.helpers({
+  packageData: function() {
+    return ReactionCore.Collections.Packages.findOne({
+      name: "reaction-braintree"
+    });
+  }
+});
+
 AutoForm.hooks({
   "braintree-update-form": {
     onSuccess: function(operation, result, template) {

@@ -1,5 +1,7 @@
 ReactionCore.registerPackage({
-  name: 'reaction-braintree',
+  label: "Brantree",
+  name: "reaction-braintree",
+  icon: "fa fa-credit-card",
   autoEnable: false,
   settings: {
     mode: false,
@@ -9,22 +11,22 @@ ReactionCore.registerPackage({
   },
   registry: [
     {
-      provides: 'dashboard',
-      label: 'Braintree',
+      provides: "dashboard",
+      label: "Braintree",
       description: "Braintree Payment for Reaction Commerce",
-      icon: 'fa fa-credit-card',
-      cycle: '3',
-      container: 'dashboard'
+      route: "dashboard/braintree",
+      icon: "fa fa-credit-card",
+      cycle: "3",
+      container: "dashboard"
     }, {
       label: "Braintree Settings",
-      i18nLabel: "app.braintreeSettings",
-      route: 'braintree',
-      provides: 'settings',
-      container: 'dashboard',
-      template: 'braintreeSettings'
+      route: "dashboard/braintree",
+      provides: "settings",
+      container: "dashboard",
+      template: "braintreeSettings"
     }, {
-      template: 'braintreePaymentForm',
-      provides: 'paymentMethod'
+      template: "braintreePaymentForm",
+      provides: "paymentMethod"
     }
   ],
   permissions: [

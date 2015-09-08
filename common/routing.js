@@ -1,8 +1,8 @@
 Router.map(function() {
-  return this.route('braintree', {
+  return this.route("dashboard/braintree", {
     controller: ShopAdminController,
-    path: 'dashboard/settings/braintree',
-    template: 'braintree',
+    path: "dashboard/braintree",
+    template: "braintree",
     waitOn: function() {
       return ReactionCore.Subscriptions.Packages;
     }

@@ -1,16 +1,55 @@
 <template name="braintreeSettings">
-  <div class="row">
-    <div class="col-md-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      Don't have a Braintree merchant ID and public/private keys? <a href="https://www.braintreepayments.com/get-started" target="_blank">Get them here.</a>
+    </div>
+    <div class="panel-body">
       {{#autoForm collection="ReactionCore.Collections.Packages" schema="ReactionCore.Schemas.BraintreePackageConfig" doc=packageData type="update" id="braintree-update-form"}}
-        <div class="form-group">
-        	Don't have a Braintree merchant ID and public/private keys? <a href="https://www.braintreepayments.com/get-started" target="_blank">Get them here.</a>
-        </div>
+        
         {{>afQuickField name='settings.merchant_id'}}
         {{>afQuickField name='settings.public_key'}}
         {{>afQuickField name='settings.private_key'}}
         {{>afQuickField name='settings.mode' type="boolean-select" trueLabel="Live - Production Mode" falseLabel="Testing - Sandbox Mode" style="width: auto"}}
-        <button type="submit" class="btn btn-primary pull-right">Update</button>
+        <button type="submit" class="btn btn-primary pull-right">Update Settings</button>
       {{/autoForm}}
     </div>
   </div>
+</template>
+
+
+<template name="braintree">
+  <div class="container-fluid-sm">  
+    <div class="flex">
+      
+      <div class="flex-item">
+        
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4>Braintree Checkout</h4>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              {{#autoForm collection="ReactionCore.Collections.Packages" schema="ReactionCore.Schemas.BraintreePackageConfig" doc=packageData type="update" id="braintree-update-form-quick" autosave=true}}
+                {{>afQuickField name='settings.mode' type="boolean-select" trueLabel="Live - Production Mode" falseLabel="Testing - Sandbox Mode" style="width: auto"}}
+              {{/autoForm}}
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="left"></div>
+          <div class="right">
+            <div class="panel-footer-item">
+              <button class="btn btn-default" data-event-action="showBraintreeSettings">
+                <i class="fa fa-gear"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+    </div>
+  </div>
+
 </template>
