@@ -47,7 +47,7 @@ Meteor.methods
           response: result
       return
     , (e) ->
-      ReactionCore.Events.warn e
+      ReactionCore.Log.warn e
       return
     )
     fut.wait()
@@ -78,7 +78,7 @@ Meteor.methods
           response: result
       return
     , (e) ->
-      ReactionCore.Events.warn e
+      ReactionCore.Log.warn e
       return
     )
     fut.wait()
