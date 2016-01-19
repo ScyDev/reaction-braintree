@@ -5,10 +5,10 @@ Package.describe({
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
-Npm.depends({'braintree': '1.29.0'});
+Npm.depends({braintree: "1.35.0"});
 
-Package.onUse(function (api, where) {
-  api.versionsFrom('METEOR@1.2');
+Package.onUse(function (api) {
+  api.versionsFrom("METEOR@1.2.1");
 
   // meteor base packages
   api.use("standard-minifiers");
@@ -31,16 +31,16 @@ Package.onUse(function (api, where) {
   api.use("coffeescript");
 
   // use reaction commerce
-  api.use("reactioncommerce:core@0.8.0");
+  api.use("reactioncommerce:core@0.10.1");
 
-  api.addFiles("server/register.coffee",["server"]); // register as a reaction package
-  api.addFiles("server/braintree.coffee",["server"]);
+  api.addFiles("server/register.coffee", ["server"]); // register as a reaction package
+  api.addFiles("server/braintree.coffee", ["server"]);
 
   api.addFiles([
     "common/collections.coffee",
     "common/routing.coffee",
     "lib/braintree.coffee"
-  ],["client","server"]);
+  ], ["client", "server"]);
 
   api.addFiles([
     "client/templates/braintree.html",
@@ -51,5 +51,4 @@ Package.onUse(function (api, where) {
     "client/templates/cart/checkout/payment/methods/braintree/braintree.coffee"
   ],
   ["client"]);
-
 });
