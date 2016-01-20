@@ -16,15 +16,18 @@ ReactionCore.Schemas.BraintreePackageConfig = new SimpleSchema([
     },
     "settings.merchant_id": {
       type: String,
-      label: "Merchant ID"
+      label: "Merchant ID",
+      optional: false
     },
     "settings.public_key": {
       type: String,
-      label: "Public Key"
+      label: "Public Key",
+      optional: false
     },
     "settings.private_key": {
       type: String,
-      label: "Private Key"
+      label: "Private Key",
+      optional: false
     }
   }
 ]);

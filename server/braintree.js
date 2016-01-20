@@ -6,6 +6,7 @@ let Future = Npm.require("fibers/future");
 
 Meteor.methods({
   braintreeSubmit: function (transactionType, cardData, paymentData) {
+    console.log("braintreeSubmit");
     var accountOptions, fut, gateway, paymentObj;
     check(transactionType, String);
     check(cardData, {

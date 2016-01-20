@@ -17,7 +17,6 @@
 
 <template name="braintree">
   <div class="container-fluid-sm flex">
-      Hello!!!
     <div class="flex-item">
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -33,7 +32,7 @@
           <div class="right">
 
             <div class="panel-footer-item">
-              {{#if packageData.settings.apiKey}}
+              {{#if packageData.settings.merchant_id}}
                 <i class="fa fa-check-circle fa-2x text-success"></i>
               {{else}}
                 <i class="fa fa-minus-circle fa-2x text-muted"></i>
