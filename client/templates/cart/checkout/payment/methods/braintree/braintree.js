@@ -28,8 +28,7 @@ handleBraintreeSubmitError = function (error) {
 let submitting = false;
 
 handleBrainTreeResponse = function (error, results) {
-  console.log("got a Response!!!");
-
+  console.log("braintree response: " + JSON.stringify(results));
   let paymentMethod;
   submitting = false;
   if (error) {
@@ -81,7 +80,7 @@ submitToBrainTree = function (doc) {
   };
   let storedCard = form.type.charAt(0).toUpperCase() + form.type.slice(1) + " " + doc.cardNumber.slice(-4);
   let cartTotal = ReactionCore.Collections.Cart.findOne().cartTotal();
-  let currencyCode = Shops.findOne().currency;
+  let currencyCode = ReactionCore.Collections.Shops.findOne().currency;
 
   Meteor.Braintree.authorize(form, {
     total: cartTotal,

@@ -6,7 +6,6 @@ let Future = Npm.require("fibers/future");
 
 Meteor.methods({
   braintreeSubmit: function (transactionType, cardData, paymentData) {
-    console.log("braintreeSubmit");
     var accountOptions, fut, gateway, paymentObj;
     check(transactionType, String);
     check(cardData, {
@@ -22,6 +21,7 @@ Meteor.methods({
       currency: String
     });
     accountOptions = Meteor.Braintree.accountOptions();
+    console.log("accountOptions: " + JSON.stringify(accountOptions));
     if (accountOptions.environment === "production") {
       accountOptions.environment = Braintree.Environment.Production;
     } else {
