@@ -1,6 +1,9 @@
+/* eslint camelcase: 0 */
+
 ReactionCore.registerPackage({
+  label: "BrainTree",
   name: "reaction-braintree", // usually same as meteor package
-  autoEnable: false, // auto-enable in dashboard
+  autoEnable: true, // auto-enable in dashboard
   settings: // private package settings config (blackbox)
   {
     mode: false,
@@ -20,12 +23,13 @@ ReactionCore.registerPackage({
       cycle: "3", // Core, Stable, Testing (currently testing)
       container: "dashboard"  // group this with settings
     },
-    // configures settings link for app card
-    // use "group" to link to dashboard card
+
     {
-      route: "braintree",
+      label: "Braintree Settings",
+      route: "dashboard/braintree",
       provides: "settings",
-      container: "dashboard"
+      container: "dashboard",
+      template: "braintreeSettings"
     },
     // configures template for checkout
     // paymentMethod dynamic template

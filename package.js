@@ -42,9 +42,9 @@ Package.onUse(function (api) {
   ], ["client", "server"]);
 
   api.addFiles([
-    "client/templates/braintree.html",
-    "client/templates/braintree.less",
-    "client/templates/braintree.js",
+    "client/templates/settings/braintree.html",
+    "client/templates/settings/braintree.less",
+    "client/templates/settings/braintree.js",
     "client/templates/cart/checkout/payment/methods/braintree/braintree.html",
     "client/templates/cart/checkout/payment/methods/braintree/braintree.less",
     "client/templates/cart/checkout/payment/methods/braintree/braintree.js"
