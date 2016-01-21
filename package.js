@@ -1,7 +1,7 @@
 Package.describe({
   summary: "Reaction Braintree - Braintree payments for Reaction Commerce",
   name: "reactioncommerce:reaction-braintree",
-  version: "1.5.1",
+  version: "1.5.2",
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
