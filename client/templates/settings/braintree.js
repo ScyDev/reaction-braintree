@@ -13,7 +13,6 @@ Template.braintree.helpers({
     let packageData = ReactionCore.Collections.Packages.findOne({
       name: "reaction-braintree"
     });
-    console.log("Show Package Data");
     return packageData;
   }
 });

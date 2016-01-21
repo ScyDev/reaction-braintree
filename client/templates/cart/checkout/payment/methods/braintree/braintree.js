@@ -1,7 +1,5 @@
 /* eslint camelcase: 0 */
 
-var submitToBrainTree;
-
 uiEnd = function (template, buttonText) {
   template.$(":input").removeAttr("disabled");
   template.$("#btn-complete-order").text(buttonText);
@@ -28,7 +26,6 @@ handleBraintreeSubmitError = function (error) {
 let submitting = false;
 
 handleBrainTreeResponse = function (error, results) {
-  console.log("braintree response: " + JSON.stringify(results));
   let paymentMethod;
   submitting = false;
   if (error) {
@@ -44,17 +41,17 @@ handleBrainTreeResponse = function (error, results) {
       if (typeof normalizedMode !== "undefined") {
         normalizedMode = normalizedModes.default;
       }
-
+      let storedCard = results.response.transaction.creditCard.cardType.toUpperCase() + " " + results.response.transaction.creditCard.last4;
       paymentMethod = {
         processor: "Braintree",
         storedCard: storedCard,
         method: results.response.transaction.creditCard.cardType,
         transactionId: results.response.transaction.id,
-        amount: results.response.transaction.amount,
+        amount: parseFloat(results.response.transaction.amount),
         status: normalizedStatus,
         mode: normalizedMode,
-        createdAt: new Date(results.response.create_time),
-        updatedAt: new Date(results.response.update_time),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         transactions: []
       };
       paymentMethod.transactions.push(results.response);
@@ -78,7 +75,7 @@ submitToBrainTree = function (doc) {
     cvv2: doc.cvv,
     type: getCardType(doc.cardNumber)
   };
-  let storedCard = form.type.charAt(0).toUpperCase() + form.type.slice(1) + " " + doc.cardNumber.slice(-4);
+  // let storedCard = form.type.charAt(0).toUpperCase() + form.type.slice(1) + " " + doc.cardNumber.slice(-4);
   let cartTotal = ReactionCore.Collections.Cart.findOne().cartTotal();
   let currencyCode = ReactionCore.Collections.Shops.findOne().currency;
 
@@ -90,8 +87,8 @@ submitToBrainTree = function (doc) {
 
 AutoForm.addHooks("braintree-payment-form", {
   onSubmit: function (doc) {
-    console.log("handling onSubmit");
     submitToBrainTree(doc);
+    return false;
   },
   beginSubmit: function () {
     this.template.$(":input").attr("disabled", true);

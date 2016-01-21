@@ -21,7 +21,6 @@ Meteor.methods({
       currency: String
     });
     accountOptions = Meteor.Braintree.accountOptions();
-    console.log("accountOptions: " + JSON.stringify(accountOptions));
     if (accountOptions.environment === "production") {
       accountOptions.environment = Braintree.Environment.Production;
     } else {
