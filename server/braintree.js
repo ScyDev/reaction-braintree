@@ -5,7 +5,7 @@ let Fiber = Npm.require("fibers");
 let Future = Npm.require("fibers/future");
 
 Meteor.methods({
-  braintreeSubmit: function (transactionType, cardData, paymentData) {
+  "braintreeSubmit": function (transactionType, cardData, paymentData) {
     var accountOptions, fut, gateway, paymentObj;
     check(transactionType, String);
     check(cardData, {
@@ -57,13 +57,21 @@ Meteor.methods({
     }));
     return fut.wait();
   },
-  braintreeCapture: function (transactionId, captureDetails) {
-    var accountOptions, fut, gateway;
-    check(transactionId, String);
-    check(captureDetails, {
-      amount: Number
-    });
-    accountOptions = Meteor.Braintree.accountOptions();
+
+
+  /**
+   * braintree/payment/capture
+   * Capture payments from Braintree
+   * https://developers.braintreepayments.com/reference/request/transaction/submit-for-settlement/node
+   * @param {Object} paymentMethod - Object containing everything about the transaction to be settled
+   * @return {Object} results - Object containing the results of the transaction
+   */
+  "braintree/payment/capture": function (paymentMethod) {
+    var fut, gateway;
+    check(paymentMethod, Object);
+    let transactionId = paymentMethod.transactions[0].transaction.id;
+    let amount = paymentMethod.transactions[0].transaction.amount;
+    let accountOptions = Meteor.Braintree.accountOptions();
     if (accountOptions.environment === "production") {
       accountOptions.environment = Braintree.Environment.Production;
     } else {
@@ -72,7 +80,7 @@ Meteor.methods({
     gateway = Braintree.connect(accountOptions);
     fut = new Future();
     this.unblock();
-    gateway.transaction.submit_for_settlement(transactionId, captureDetails, Meteor.bindEnvironment(function (error, result) {
+    gateway.transaction.submitForSettlement(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
       if (error) {
         fut["return"]({
           saved: false,
