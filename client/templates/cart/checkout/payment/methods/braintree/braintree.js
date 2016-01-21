@@ -33,14 +33,8 @@ handleBrainTreeResponse = function (error, results) {
     uiEnd(template, "Resubmit payment");
   } else {
     if (results.saved === true) {
-      let normalizedStatus = normalizedStates[results.response.transaction.status];
-      if (typeof normalizedStatus !== "undefined") {
-        normalizedStatus = normalizedStates.default;
-      }
-      let normalizedMode = normalizedModes[results.response.transaction.status];
-      if (typeof normalizedMode !== "undefined") {
-        normalizedMode = normalizedModes.default;
-      }
+      let normalizedStatus = normalizeState(results.response.transaction.status);
+      let normalizedMode = normalizeMode(results.response.transaction.status);
       let storedCard = results.response.transaction.creditCard.cardType.toUpperCase() + " " + results.response.transaction.creditCard.last4;
       paymentMethod = {
         processor: "Braintree",
@@ -75,7 +69,6 @@ submitToBrainTree = function (doc) {
     cvv2: doc.cvv,
     type: getCardType(doc.cardNumber)
   };
-  // let storedCard = form.type.charAt(0).toUpperCase() + form.type.slice(1) + " " + doc.cardNumber.slice(-4);
   let cartTotal = ReactionCore.Collections.Cart.findOne().cartTotal();
   let currencyCode = ReactionCore.Collections.Shops.findOne().currency;
 
@@ -119,6 +112,14 @@ const normalizedStates = {
   default: "failed"
 };
 
+normalizeState = function (stateString) {
+  let normalizedState = normalizedStates[stateString];
+  if (typeof normalizedState === "undefined") {
+    normalizedState = normalizedStates.default;
+  }
+  return normalizedState;
+};
+
 const normalizedModes = {
   settled: "capture",
   settling: "capture",
@@ -127,4 +128,12 @@ const normalizedModes = {
   authorized: "authorize",
   authorizing: "authorize",
   default: "capture"
+};
+
+normalizeMode = function (modeString) {
+  let normalizedMode = normalizedModes[modeString];
+  if (typeof normalizedMode === "undefined") {
+    normalizedMode = normalizedModes.default;
+  }
+  return normalizedMode;
 };
