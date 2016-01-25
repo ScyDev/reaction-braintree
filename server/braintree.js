@@ -67,7 +67,6 @@ Meteor.methods({
    * @return {Object} results - Object containing the results of the transaction
    */
   "braintree/payment/capture": function (paymentMethod) {
-    var fut, gateway;
     check(paymentMethod, Object);
     let transactionId = paymentMethod.transactions[0].transaction.id;
     let amount = paymentMethod.transactions[0].transaction.amount;
@@ -77,8 +76,8 @@ Meteor.methods({
     } else {
       accountOptions.environment = Braintree.Environment.Sandbox;
     }
-    gateway = Braintree.connect(accountOptions);
-    fut = new Future();
+    let gateway = Braintree.connect(accountOptions);
+    const fut = new Future();
     this.unblock();
     gateway.transaction.submitForSettlement(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
       if (error) {
@@ -97,8 +96,42 @@ Meteor.methods({
     }));
     return fut.wait();
   },
-  "braintree/refund/create": function () {
-    console.log('refund create');
+  /**
+   * braintree/refund/create
+   * Refund BrainTree payment
+   * https://developers.braintreepayments.com/reference/request/transaction/refund/node
+   * @return {Object} results - Object containing the results of the transaction
+   */
+  "braintree/refund/create": function (paymentMethod, amount) {
+    check(paymentMethod, Object);
+    check(amount, Number);
+    let transactionId = paymentMethod.transactions[0].transaction.id;
+    let accountOptions = Meteor.Braintree.accountOptions();
+    if (accountOptions.environment === "production") {
+      accountOptions.environment = Braintree.Environment.Production;
+    } else {
+      accountOptions.environment = Braintree.Environment.Sandbox;
+    }
+    let gateway = Braintree.connect(accountOptions);
+    const fut = new Future();
+    this.unblock();
+    gateway.transaction.refund(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
+      if (error) {
+        fut["return"]({
+          saved: false,
+          error: error
+        });
+      } else {
+        fut["return"]({
+          saved: true,
+          response: result
+        });
+      }
+
+    }, function (error) {
+      ReactionCore.Events.warn(error);
+    }));
+    return fut.wait();
   }
 });
 
