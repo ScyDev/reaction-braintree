@@ -17,48 +17,15 @@ hidePaymentAlert = function () {
 handleBraintreeSubmitError = function (error) {
   let serverError = error !== null ? error.message : void 0;
   if (serverError) {
-    return paymentAlert("Oops! " + serverError);
+    return paymentAlert("Server Error " + serverError);
   } else if (error) {
-    return paymentAlert("Oops! " + error);
+    return paymentAlert("Oops " + error);
   }
 };
 
 let submitting = false;
 
-handleBrainTreeResponse = function (error, results) {
-  let paymentMethod;
-  submitting = false;
-  if (error) {
-    handleBraintreeSubmitError(error);
-    uiEnd(template, "Resubmit payment");
-  } else {
-    if (results.saved === true) {
-      let normalizedStatus = normalizeState(results.response.transaction.status);
-      let normalizedMode = normalizeMode(results.response.transaction.status);
-      let storedCard = results.response.transaction.creditCard.cardType.toUpperCase() + " " + results.response.transaction.creditCard.last4;
-      paymentMethod = {
-        processor: "Braintree",
-        storedCard: storedCard,
-        method: results.response.transaction.creditCard.cardType,
-        transactionId: results.response.transaction.id,
-        amount: parseFloat(results.response.transaction.amount),
-        status: normalizedStatus,
-        mode: normalizedMode,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        transactions: []
-      };
-      paymentMethod.transactions.push(results.response);
-      Meteor.call("cart/submitPayment", paymentMethod);
-    } else {
-      handleBraintreeSubmitError(results.response.message);
-      uiEnd(template, "Resubmit payment");
-    }
-  }
-
-};
-
-submitToBrainTree = function (doc) {
+submitToBrainTree = function (doc, template) {
   submitting = true;
   hidePaymentAlert();
   let form = {
@@ -75,12 +42,43 @@ submitToBrainTree = function (doc) {
   Meteor.Braintree.authorize(form, {
     total: cartTotal,
     currency: currencyCode
-  }, handleBrainTreeResponse);
+  }, function (error, results) {
+    let paymentMethod;
+    submitting = false;
+    if (error) {
+      handleBraintreeSubmitError(error);
+      uiEnd(template, "Resubmit payment");
+    } else {
+      if (results.saved === true) {
+        let normalizedStatus = normalizeState(results.response.transaction.status);
+        let normalizedMode = normalizeMode(results.response.transaction.status);
+        let storedCard = results.response.transaction.creditCard.cardType.toUpperCase() + " " + results.response.transaction.creditCard.last4;
+        paymentMethod = {
+          processor: "Braintree",
+          storedCard: storedCard,
+          method: results.response.transaction.creditCard.cardType,
+          transactionId: results.response.transaction.id,
+          amount: parseFloat(results.response.transaction.amount),
+          status: normalizedStatus,
+          mode: normalizedMode,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          transactions: []
+        };
+        paymentMethod.transactions.push(results.response);
+        Meteor.call("cart/submitPayment", paymentMethod);
+      } else {
+        handleBraintreeSubmitError(results.response.message);
+        uiEnd(template, "Resubmit payment");
+      }
+    }
+
+  });
 };
 
 AutoForm.addHooks("braintree-payment-form", {
   onSubmit: function (doc) {
-    submitToBrainTree(doc);
+    submitToBrainTree(doc, this.template);
     return false;
   },
   beginSubmit: function () {

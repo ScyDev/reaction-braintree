@@ -39,7 +39,7 @@ Meteor.methods({
       if (error) {
         fut["return"]({
           saved: false,
-          error: err
+          error: error
         });
       } else if (!result.success) {
         fut["return"]({
@@ -52,8 +52,8 @@ Meteor.methods({
           response: result
         });
       }
-    }, function (e) {
-      ReactionCore.Events.warn(e);
+    }, function (error) {
+      ReactionCore.Events.warn(error);
     }));
     return fut.wait();
   },
@@ -96,6 +96,9 @@ Meteor.methods({
       ReactionCore.Events.warn(e);
     }));
     return fut.wait();
+  },
+  "braintree/refund/create": function () {
+    console.log('refund create');
   }
 });
 
