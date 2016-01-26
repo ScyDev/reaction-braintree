@@ -92,7 +92,7 @@ Meteor.methods({
         });
       }
     }, function (e) {
-      ReactionCore.Events.warn(e);
+      ReactionCore.Log.warn(e);
     }));
     return fut.wait();
   },
@@ -121,15 +121,20 @@ Meteor.methods({
           saved: false,
           error: error
         });
-      } else {
+      } else if (!result.success) {
+        fut["return"]({
+          saved: false,
+          error: result.message
+        })
+      }
+      else {
         fut["return"]({
           saved: true,
           response: result
         });
       }
-
-    }, function (error) {
-      ReactionCore.Events.warn(error);
+    }, function (e) {
+      ReactionCore.Log.warn(e);
     }));
     return fut.wait();
   }
