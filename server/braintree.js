@@ -4,9 +4,20 @@ let Fiber = Npm.require("fibers");
 
 let Future = Npm.require("fibers/future");
 
+function getGateway() {
+  let accountOptions = Meteor.Braintree.accountOptions();
+  if (accountOptions.environment === "production") {
+      accountOptions.environment = Braintree.Environment.Production;
+    } else {
+        accountOptions.environment = Braintree.Environment.Sandbox;
+      }
+  let gateway = Braintree.connect(accountOptions);
+  return gateway;
+}
+
+
 Meteor.methods({
   "braintreeSubmit": function (transactionType, cardData, paymentData) {
-    var accountOptions, fut, gateway, paymentObj;
     check(transactionType, String);
     check(cardData, {
       name: String,
@@ -20,20 +31,14 @@ Meteor.methods({
       total: String,
       currency: String
     });
-    accountOptions = Meteor.Braintree.accountOptions();
-    if (accountOptions.environment === "production") {
-      accountOptions.environment = Braintree.Environment.Production;
-    } else {
-      accountOptions.environment = Braintree.Environment.Sandbox;
-    }
-    gateway = Braintree.connect(accountOptions);
-    paymentObj = Meteor.Braintree.paymentObj();
+    let gateway = getGateway();
+    let paymentObj = Meteor.Braintree.paymentObj();
     if (transactionType === "authorize") {
       paymentObj.options.submitForSettlement = false;
     }
     paymentObj.creditCard = Meteor.Braintree.parseCardData(cardData);
     paymentObj.amount = paymentData.total;
-    fut = new Future();
+    let fut = new Future();
     this.unblock();
     gateway.transaction.sale(paymentObj, Meteor.bindEnvironment(function (error, result) {
       if (error) {
@@ -70,13 +75,7 @@ Meteor.methods({
     check(paymentMethod, Object);
     let transactionId = paymentMethod.transactions[0].transaction.id;
     let amount = paymentMethod.transactions[0].transaction.amount;
-    let accountOptions = Meteor.Braintree.accountOptions();
-    if (accountOptions.environment === "production") {
-      accountOptions.environment = Braintree.Environment.Production;
-    } else {
-      accountOptions.environment = Braintree.Environment.Sandbox;
-    }
-    let gateway = Braintree.connect(accountOptions);
+    let gateway = getGateway();
     const fut = new Future();
     this.unblock();
     gateway.transaction.submitForSettlement(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
@@ -106,13 +105,7 @@ Meteor.methods({
     check(paymentMethod, Object);
     check(amount, Number);
     let transactionId = paymentMethod.transactions[0].transaction.id;
-    let accountOptions = Meteor.Braintree.accountOptions();
-    if (accountOptions.environment === "production") {
-      accountOptions.environment = Braintree.Environment.Production;
-    } else {
-      accountOptions.environment = Braintree.Environment.Sandbox;
-    }
-    let gateway = Braintree.connect(accountOptions);
+    let gateway = getGateway();
     const fut = new Future();
     this.unblock();
     gateway.transaction.refund(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
@@ -149,27 +142,26 @@ Meteor.methods({
   "braintree/refund/list": function (paymentMethod) {
     check(paymentMethod, Object);
     let transactionId = paymentMethod.transactionId;
-    let accountOptions = Meteor.Braintree.accountOptions();
-    if (accountOptions.environment === "production") {
-      accountOptions.environment = Braintree.Environment.Production;
-    } else {
-      accountOptions.environment = Braintree.Environment.Sandbox;
-    }
-    let gateway = Braintree.connect(accountOptions);
-    const fut = new Future();
+    var gateway = getGateway();
     this.unblock();
-    gateway.transaction.find(transactionId, Meteor.bindEnvironment(function (error, result) {
-    if (error) {
-      fut["return"]([]);
-    } else if (result.refundIds.length > 0) {
+    let braintreeFind = Meteor.wrapAsync(gateway.transaction.find, gateway.transaction);
+    let findResults = braintreeFind(transactionId);
+    let result = [];
+    if (findResults.refundIds.length > 0) {
       console.log("we have refunds");
-      fut["return"]([]);
+      for (let refund of findResults.refundIds) {
+        result.push({
+          type: refund.object,
+          amount: refund.amount / 100,
+          created: refund.created * 1000,
+          currency: refund.currency,
+          raw: refund
+        });
+      }
     } else {
-      console.log("no errors, no refunds");
-      fut["return"]([]);
+      console.log("no refunds found");
     }
-
-    }));
+    return result;
 
   }
 });
