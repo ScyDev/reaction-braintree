@@ -122,10 +122,17 @@ Meteor.methods({
           error: error
         });
       } else if (!result.success) {
-        fut["return"]({
-          saved: false,
-          error: result.message
-        })
+        if (result.errors.errorCollections.transaction.validationErrors.base[0].code === "91506") {
+          fut["return"]({
+            saved: false,
+            error: "Cannot refund transaction until it\'s settled. Please try again later"
+          })
+        } else {
+          fut["return"]({
+            saved: false,
+            error: result.message
+          })
+        }
       }
       else {
         fut["return"]({
@@ -137,6 +144,33 @@ Meteor.methods({
       ReactionCore.Log.warn(e);
     }));
     return fut.wait();
+  },
+
+  "braintree/refund/list": function (paymentMethod) {
+    check(paymentMethod, Object);
+    let transactionId = paymentMethod.transactionId;
+    let accountOptions = Meteor.Braintree.accountOptions();
+    if (accountOptions.environment === "production") {
+      accountOptions.environment = Braintree.Environment.Production;
+    } else {
+      accountOptions.environment = Braintree.Environment.Sandbox;
+    }
+    let gateway = Braintree.connect(accountOptions);
+    const fut = new Future();
+    this.unblock();
+    gateway.transaction.find(transactionId, Meteor.bindEnvironment(function (error, result) {
+    if (error) {
+      fut["return"]([]);
+    } else if (result.refundIds.length > 0) {
+      console.log("we have refunds");
+      fut["return"]([]);
+    } else {
+      console.log("no errors, no refunds");
+      fut["return"]([]);
+    }
+
+    }));
+
   }
 });
 
