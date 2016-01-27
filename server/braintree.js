@@ -139,30 +139,42 @@ Meteor.methods({
     return fut.wait();
   },
 
+  /**
+   * braintree/refund/list
+   * List all refunds for a transaction
+   * https://developers.braintreepayments.com/reference/request/transaction/find/node
+   * @return {Array} results - An array of refund objects for display in admin
+   */
   "braintree/refund/list": function (paymentMethod) {
     check(paymentMethod, Object);
     let transactionId = paymentMethod.transactionId;
-    var gateway = getGateway();
+    let gateway = getGateway();
     this.unblock();
     let braintreeFind = Meteor.wrapAsync(gateway.transaction.find, gateway.transaction);
     let findResults = braintreeFind(transactionId);
     let result = [];
     if (findResults.refundIds.length > 0) {
-      console.log("we have refunds");
       for (let refund of findResults.refundIds) {
+        let refundDetails = getRefundDetails(refund);
         result.push({
-          type: refund.object,
-          amount: refund.amount / 100,
-          created: refund.created * 1000,
-          currency: refund.currency,
-          raw: refund
+          type: "refund",
+          amount: refundDetails.amount,
+          created: refundDetails.createdAt,
+          currency: refundDetails.currencyIsoCode,
+          raw: refundDetails
         });
       }
-    } else {
-      console.log("no refunds found");
     }
     return result;
 
   }
 });
+
+getRefundDetails = function (refundId) {
+  check(refundId, String);
+  let gateway = getGateway();
+  let braintreeFind = Meteor.wrapAsync(gateway.transaction.find, gateway.transaction);
+  let findResults = braintreeFind(refundId);
+  return findResults;
+};
 
