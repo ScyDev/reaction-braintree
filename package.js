@@ -30,7 +30,7 @@ Package.onUse(function (api) {
   api.use("less");
 
   // use reaction commerce
-  api.use("reactioncommerce:core@0.10.1");
+  api.use("reactioncommerce:core@0.11.0");
 
   api.addFiles("server/register.js", ["server"]); // register as a reaction package
   api.addFiles("server/braintree.js", ["server"]);
