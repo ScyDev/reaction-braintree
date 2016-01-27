@@ -1,14 +1,14 @@
 Package.describe({
   summary: "Reaction Braintree - Braintree payments for Reaction Commerce",
   name: "reactioncommerce:reaction-braintree",
-  version: "1.5.0",
+  version: "1.5.2",
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
-Npm.depends({'braintree': '1.29.0'});
+Npm.depends({braintree: "1.35.0"});
 
-Package.onUse(function (api, where) {
-  api.versionsFrom('METEOR@1.2');
+Package.onUse(function (api) {
+  api.versionsFrom("METEOR@1.2.1");
 
   // meteor base packages
   api.use("standard-minifiers");
@@ -28,28 +28,26 @@ Package.onUse(function (api, where) {
 
   // meteor add-on packages
   api.use("less");
-  api.use("coffeescript");
 
   // use reaction commerce
-  api.use("reactioncommerce:core@0.8.0");
+  api.use("reactioncommerce:core@0.11.0");
 
-  api.addFiles("server/register.coffee",["server"]); // register as a reaction package
-  api.addFiles("server/braintree.coffee",["server"]);
-
-  api.addFiles([
-    "common/collections.coffee",
-    "common/routing.coffee",
-    "lib/braintree.coffee"
-  ],["client","server"]);
+  api.addFiles("server/register.js", ["server"]); // register as a reaction package
+  api.addFiles("server/braintree.js", ["server"]);
 
   api.addFiles([
-    "client/templates/braintree.html",
-    "client/templates/braintree.less",
-    "client/templates/braintree.coffee",
+    "common/collections.js",
+    "common/routing.js",
+    "lib/braintree.js"
+  ], ["client", "server"]);
+
+  api.addFiles([
+    "client/templates/settings/braintree.html",
+    "client/templates/settings/braintree.less",
+    "client/templates/settings/braintree.js",
     "client/templates/cart/checkout/payment/methods/braintree/braintree.html",
     "client/templates/cart/checkout/payment/methods/braintree/braintree.less",
-    "client/templates/cart/checkout/payment/methods/braintree/braintree.coffee"
+    "client/templates/cart/checkout/payment/methods/braintree/braintree.js"
   ],
   ["client"]);
-
 });
