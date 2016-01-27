@@ -1,16 +1,14 @@
 const Braintree = Npm.require("braintree");
 
-let Fiber = Npm.require("fibers");
-
 let Future = Npm.require("fibers/future");
 
 function getGateway() {
   let accountOptions = Meteor.Braintree.accountOptions();
   if (accountOptions.environment === "production") {
-      accountOptions.environment = Braintree.Environment.Production;
-    } else {
-        accountOptions.environment = Braintree.Environment.Sandbox;
-      }
+    accountOptions.environment = Braintree.Environment.Production;
+  } else {
+    accountOptions.environment = Braintree.Environment.Sandbox;
+  }
   let gateway = Braintree.connect(accountOptions);
   return gateway;
 }
@@ -42,17 +40,17 @@ Meteor.methods({
     this.unblock();
     gateway.transaction.sale(paymentObj, Meteor.bindEnvironment(function (error, result) {
       if (error) {
-        fut["return"]({
+        fut.return({
           saved: false,
           error: error
         });
       } else if (!result.success) {
-        fut["return"]({
+        fut.return({
           saved: false,
           response: result
         });
       } else {
-        fut["return"]({
+        fut.return({
           saved: true,
           response: result
         });
@@ -80,12 +78,12 @@ Meteor.methods({
     this.unblock();
     gateway.transaction.submitForSettlement(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
       if (error) {
-        fut["return"]({
+        fut.return({
           saved: false,
           error: error
         });
       } else {
-        fut["return"]({
+        fut.return({
           saved: true,
           response: result
         });
@@ -99,6 +97,8 @@ Meteor.methods({
    * braintree/refund/create
    * Refund BrainTree payment
    * https://developers.braintreepayments.com/reference/request/transaction/refund/node
+   * @param {Object} paymentMethod - Object containing everything about the transaction to be settled
+   * @param {Number} amount - Amount to be refunded if not the entire amount
    * @return {Object} results - Object containing the results of the transaction
    */
   "braintree/refund/create": function (paymentMethod, amount) {
@@ -110,25 +110,24 @@ Meteor.methods({
     this.unblock();
     gateway.transaction.refund(transactionId, amount, Meteor.bindEnvironment(function (error, result) {
       if (error) {
-        fut["return"]({
+        fut.return({
           saved: false,
           error: error
         });
       } else if (!result.success) {
         if (result.errors.errorCollections.transaction.validationErrors.base[0].code === "91506") {
-          fut["return"]({
+          fut.return({
             saved: false,
             error: "Cannot refund transaction until it\'s settled. Please try again later"
-          })
+          });
         } else {
-          fut["return"]({
+          fut.return({
             saved: false,
             error: result.message
-          })
+          });
         }
-      }
-      else {
-        fut["return"]({
+      } else {
+        fut.return({
           saved: true,
           response: result
         });
@@ -143,6 +142,7 @@ Meteor.methods({
    * braintree/refund/list
    * List all refunds for a transaction
    * https://developers.braintreepayments.com/reference/request/transaction/find/node
+   * @param {Object} paymentMethod - Object containing everything about the transaction to be settled
    * @return {Array} results - An array of refund objects for display in admin
    */
   "braintree/refund/list": function (paymentMethod) {
@@ -166,7 +166,6 @@ Meteor.methods({
       }
     }
     return result;
-
   }
 });
 
