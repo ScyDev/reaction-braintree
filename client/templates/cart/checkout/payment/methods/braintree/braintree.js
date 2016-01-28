@@ -11,7 +11,7 @@ paymentAlert = function (errorMessage) {
 };
 
 hidePaymentAlert = function () {
-  return $(".alert").addClass("hidden").text('');
+  return $(".alert").addClass("hidden").text("");
 };
 
 handleBraintreeSubmitError = function (error) {
@@ -72,7 +72,6 @@ submitToBrainTree = function (doc, template) {
         uiEnd(template, "Resubmit payment");
       }
     }
-
   });
 };
 
