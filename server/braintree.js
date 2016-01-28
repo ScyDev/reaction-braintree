@@ -2,7 +2,7 @@ const Braintree = Npm.require("braintree");
 
 let Future = Npm.require("fibers/future");
 
-function getGateway() {
+getGateway = function () {
   let accountOptions = Meteor.Braintree.accountOptions();
   if (accountOptions.environment === "production") {
     accountOptions.environment = Braintree.Environment.Production;
@@ -11,10 +11,19 @@ function getGateway() {
   }
   let gateway = Braintree.connect(accountOptions);
   return gateway;
-}
+};
 
 
 Meteor.methods({
+  /**
+   * braintreeSubmit
+   * Authorize, or authorize and capture payments from Brinatree
+   * https://developers.braintreepayments.com/reference/request/transaction/sale/node
+   * @param {String} transactionType - either authorize or capture
+   * @param {Object} cardData - Object containing everything about the Credit card to be submitted
+   * @param {Object} paymentData - Object containing everything about the transaction to be settled
+   * @return {Object} results - Object containing the results of the transaction
+   */
   "braintreeSubmit": function (transactionType, cardData, paymentData) {
     check(transactionType, String);
     check(cardData, {
