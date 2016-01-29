@@ -1,7 +1,7 @@
 Package.describe({
   summary: "Reaction Braintree - Braintree payments for Reaction Commerce",
   name: "reactioncommerce:reaction-braintree",
-  version: "1.5.2",
+  version: "1.5.3",
   git: "https://github.com/reactioncommerce/reaction-braintree.git"
 });
 
@@ -11,8 +11,6 @@ Package.onUse(function (api) {
   api.versionsFrom("METEOR@1.2.1");
 
   // meteor base packages
-  api.use("standard-minifiers");
-  api.use("mobile-experience");
   api.use("meteor-base");
   api.use("mongo");
   api.use("blaze-html-templates");
@@ -30,14 +28,13 @@ Package.onUse(function (api) {
   api.use("less");
 
   // use reaction commerce
-  api.use("reactioncommerce:core@0.11.0");
+  api.use("reactioncommerce:core@0.12.0");
 
   api.addFiles("server/register.js", ["server"]); // register as a reaction package
   api.addFiles("server/braintree.js", ["server"]);
 
   api.addFiles([
     "common/collections.js",
-    "common/routing.js",
     "lib/braintree.js"
   ], ["client", "server"]);
 

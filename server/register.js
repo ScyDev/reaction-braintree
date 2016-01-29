@@ -19,9 +19,10 @@ ReactionCore.registerPackage({
       provides: "dashboard",
       label: "Braintree",
       description: "Braintree Payment for Reaction Commerce",
-      icon: "fa fa-credit-card", // glyphicon/fa
-      cycle: "3", // Core, Stable, Testing (currently testing)
-      container: "dashboard"  // group this with settings
+      icon: "fa fa-credit-card",
+      cycle: "2",
+      container: "dashboard",
+      template: "braintree"
     },
 
     {
