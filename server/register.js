@@ -2,6 +2,7 @@
 
 ReactionCore.registerPackage({
   label: "BrainTree",
+  icon: "fa fa-credit-card",
   name: "reaction-braintree", // usually same as meteor package
   autoEnable: true, // auto-enable in dashboard
   settings: // private package settings config (blackbox)
@@ -22,7 +23,13 @@ ReactionCore.registerPackage({
       icon: "fa fa-credit-card",
       cycle: "2",
       container: "dashboard",
-      template: "braintree"
+      template: "braintree",
+      permissions: [
+        {
+          label: "Braintree Dashboard",
+          permission: "dashboard/payments",
+        }
+      ]
     },
 
     {
@@ -37,14 +44,6 @@ ReactionCore.registerPackage({
     {
       template: "braintreePaymentForm",
       provides: "paymentMethod"
-    }
-  ],
-  // array of permission objects
-  permissions: [
-    {
-      label: "Braintree",
-      permission: "dashboard/payments",
-      group: "Shop Settings"
     }
   ]
 });
