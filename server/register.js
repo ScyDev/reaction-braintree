@@ -21,7 +21,7 @@ ReactionCore.registerPackage({
       label: "Braintree",
       description: "Braintree payments",
       icon: "fa fa-credit-card",
-      cycle: "2",
+      priority: 2,
       container: "dashboard",
       template: "braintree",
       permissions: [
