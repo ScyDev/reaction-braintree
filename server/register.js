@@ -22,12 +22,12 @@ ReactionCore.registerPackage({
       description: "Braintree payments",
       icon: "fa fa-credit-card",
       priority: 2,
-      container: "dashboard",
+      container: "paymentMethod",
       template: "braintree",
       permissions: [
         {
           label: "Braintree Dashboard",
-          permission: "dashboard/payments",
+          permission: "dashboard/payments"
         }
       ]
     },
