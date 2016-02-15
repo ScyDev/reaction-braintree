@@ -34,7 +34,7 @@ ReactionCore.registerPackage({
 
     {
       label: "Braintree Settings",
-      route: "dashboard/braintree",
+      route: "/dashboard/braintree",
       provides: "settings",
       container: "dashboard",
       template: "braintreeSettings"
