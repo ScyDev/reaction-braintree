@@ -47,12 +47,10 @@ submitToBrainTree = function (doc, template) {
     let paymentMethod;
     submitting = false;
     if (error) {
-      console.log("Braintree failed: "+error);
+      console.log("Braintree failed: %o", error);
       handleBraintreeSubmitError(error);
       uiEnd(template, "Resubmit payment");
     } else {
-      ReactionCore.Log.info("Braintree results: ", results);
-      console.log("Braintree results: %o", results);
 
       if (results.saved === true) {
         let normalizedStatus = normalizeState(results.response.transaction.status);
