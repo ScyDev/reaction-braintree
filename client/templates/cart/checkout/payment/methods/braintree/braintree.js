@@ -39,6 +39,7 @@ submitToBrainTree = function (doc, template) {
   let cartTotal = ReactionCore.Collections.Cart.findOne().cartTotal();
   let currencyCode = ReactionCore.Collections.Shops.findOne().currency;
 
+  console.log("Braintree authorize: "+cartTotal+" "+currencyCode);
   Meteor.Braintree.authorize(form, {
     total: cartTotal,
     currency: currencyCode
@@ -46,9 +47,13 @@ submitToBrainTree = function (doc, template) {
     let paymentMethod;
     submitting = false;
     if (error) {
+      console.log("Braintree failed: "+error);
       handleBraintreeSubmitError(error);
       uiEnd(template, "Resubmit payment");
     } else {
+      ReactionCore.Log.info("Braintree results: ", results);
+      console.log("Braintree results: %o", results);
+
       if (results.saved === true) {
         let normalizedStatus = normalizeState(results.response.transaction.status);
         let normalizedMode = normalizeMode(results.response.transaction.status);
@@ -68,6 +73,7 @@ submitToBrainTree = function (doc, template) {
         paymentMethod.transactions.push(results.response);
         Meteor.call("cart/submitPayment", paymentMethod);
       } else {
+        console.log("Braintree failed: %o", results);
         handleBraintreeSubmitError(results.response.message);
         uiEnd(template, "Resubmit payment");
       }

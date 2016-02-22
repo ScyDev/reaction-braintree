@@ -10,6 +10,9 @@ getGateway = function () {
     accountOptions.environment = Braintree.Environment.Sandbox;
   }
   let gateway = Braintree.connect(accountOptions);
+
+  ReactionCore.Log.info("getGateway: ",gateway);
+
   return gateway;
 };
 
@@ -25,6 +28,8 @@ Meteor.methods({
    * @return {Object} results - Object containing the results of the transaction
    */
   "braintreeSubmit": function (transactionType, cardData, paymentData) {
+    ReactionCore.Log.info("braintreeSubmit: ",transactionType, " ", cardData, " ", paymentData);
+
     check(transactionType, String);
     check(cardData, {
       name: String,
@@ -185,4 +190,3 @@ getRefundDetails = function (refundId) {
   let findResults = braintreeFind(refundId);
   return findResults;
 };
-
