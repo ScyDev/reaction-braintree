@@ -3,9 +3,9 @@
 
     <div class="panel-body">
       {{#autoForm collection="ReactionCore.Collections.Packages" schema="ReactionCore.Schemas.PaymentMethodPackageConfig" doc=packageData type="update" id="braintree-update-form"}}
-        {{>afQuickField name='settings.merchant_id'}}
-        {{>afQuickField name='settings.public_key'}}
-        {{>afQuickField name='settings.private_key'}}
+        Merchant ID: {{>afQuickField name='settings.merchant_id'}}
+        Public key: {{>afQuickField name='settings.public_key'}}
+        Private key: {{>afQuickField name='settings.private_key'}}
         {{>afQuickField name='settings.mode' type="boolean-select" trueLabel="Live - Production Mode" falseLabel="Testing - Sandbox Mode" style="width: auto"}}
         <button type="submit" class="btn btn-primary pull-right">Update</button>
       {{/autoForm}}
