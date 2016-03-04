@@ -11,8 +11,6 @@ getGateway = function () {
   }
   let gateway = Braintree.connect(accountOptions);
 
-  ReactionCore.Log.info("getGateway: ",gateway);
-
   return gateway;
 };
 
@@ -28,7 +26,7 @@ Meteor.methods({
    * @return {Object} results - Object containing the results of the transaction
    */
   "braintreeSubmit": function (transactionType, cardData, paymentData) {
-    ReactionCore.Log.info("braintreeSubmit: ",transactionType, " ", cardData, " ", paymentData);
+    ReactionCore.Log.info("braintreeSubmit: ",transactionType, " ", paymentData);
 
     check(transactionType, String);
     check(cardData, {
