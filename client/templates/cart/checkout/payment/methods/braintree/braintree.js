@@ -26,57 +26,87 @@ handleBraintreeSubmitError = function (error) {
 let submitting = false;
 
 submitToBrainTree = function (doc, template) {
-  submitting = true;
-  hidePaymentAlert();
-  let form = {
-    name: doc.payerName,
-    number: doc.cardNumber,
-    expirationMonth: doc.expireMonth,
-    expirationYear: doc.expireYear,
-    cvv2: doc.cvv,
-    type: getCardType(doc.cardNumber)
-  };
-  let cartTotal = ReactionCore.Collections.Cart.findOne().cartTotal();
-  let currencyCode = ReactionCore.Collections.Shops.findOne().currency;
+  // check if still enough inventory Quantity of products available
+  let cart = ReactionCore.Collections.Cart.findOne();
+  console.log("cart: ",cart);
 
-  console.log("Braintree authorize: "+cartTotal+" "+currencyCode);
-  Meteor.Braintree.authorize(form, {
-    total: cartTotal,
-    currency: currencyCode
-  }, function (error, results) {
-    let paymentMethod;
-    submitting = false;
-    if (error) {
-      console.log("Braintree failed: %o", error);
-      handleBraintreeSubmitError(error);
-      uiEnd(template, "Resubmit payment");
-    } else {
+  Meteor.call("cart/checkInventoryQuantity", cart._id, function(error, result) {
+      if (error) {
+        console.log("error from cart/checkInventoryQuantity:",error);
 
-      if (results.saved === true) {
-        let normalizedStatus = normalizeState(results.response.transaction.status);
-        let normalizedMode = normalizeMode(results.response.transaction.status);
-        let storedCard = results.response.transaction.creditCard.cardType.toUpperCase() + " " + results.response.transaction.creditCard.last4;
-        paymentMethod = {
-          processor: "Braintree",
-          storedCard: storedCard,
-          method: results.response.transaction.creditCard.cardType,
-          transactionId: results.response.transaction.id,
-          amount: parseFloat(results.response.transaction.amount),
-          status: normalizedStatus,
-          mode: normalizedMode,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          transactions: []
-        };
-        paymentMethod.transactions.push(results.response);
-        Meteor.call("cart/submitPayment", paymentMethod);
-      } else {
-        console.log("Braintree failed: %o", results);
-        handleBraintreeSubmitError(results.response.message);
+        Alerts.alert({
+          title: i18next.t("order.outOfStock", "No longer available"),
+          text: i18next.t("order.productInventoryHasChanged", "We're sorry. Somebody bought this product while you were shopping."),
+          type: "warning",
+        },
+        function() {
+          // ...
+        }
+        );
+
+        //handleBraintreeSubmitError(error);
         uiEnd(template, "Resubmit payment");
+
+        return;
+      }
+      else if (result === true) {
+
+        // the original code of function submitToBrainTree()
+          submitting = true;
+          hidePaymentAlert();
+          let form = {
+            name: doc.payerName,
+            number: doc.cardNumber,
+            expirationMonth: doc.expireMonth,
+            expirationYear: doc.expireYear,
+            cvv2: doc.cvv,
+            type: getCardType(doc.cardNumber)
+          };
+          let cartTotal = ReactionCore.Collections.Cart.findOne().cartTotal();
+          let currencyCode = ReactionCore.Collections.Shops.findOne().currency;
+
+          console.log("Braintree authorize: "+cartTotal+" "+currencyCode);
+          Meteor.Braintree.authorize(form, {
+            total: cartTotal,
+            currency: currencyCode
+          }, function (error, results) {
+            let paymentMethod;
+            submitting = false;
+            if (error) {
+              console.log("Braintree failed: %o", error);
+              handleBraintreeSubmitError(error);
+              uiEnd(template, "Resubmit payment");
+            } else {
+
+              if (results.saved === true) {
+                let normalizedStatus = normalizeState(results.response.transaction.status);
+                let normalizedMode = normalizeMode(results.response.transaction.status);
+                let storedCard = results.response.transaction.creditCard.cardType.toUpperCase() + " " + results.response.transaction.creditCard.last4;
+                paymentMethod = {
+                  processor: "Braintree",
+                  storedCard: storedCard,
+                  method: results.response.transaction.creditCard.cardType,
+                  transactionId: results.response.transaction.id,
+                  amount: parseFloat(results.response.transaction.amount),
+                  status: normalizedStatus,
+                  mode: normalizedMode,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  transactions: []
+                };
+                paymentMethod.transactions.push(results.response);
+                Meteor.call("cart/submitPayment", paymentMethod);
+              } else {
+                console.log("Braintree failed: %o", results);
+                handleBraintreeSubmitError(results.response.message);
+                uiEnd(template, "Resubmit payment");
+              }
+            }
+          });
       }
     }
-  });
+  );
+
 };
 
 AutoForm.addHooks("braintree-payment-form", {
