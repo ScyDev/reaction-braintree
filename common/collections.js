@@ -35,32 +35,64 @@ ReactionCore.Schemas.BraintreePackageConfig = new SimpleSchema([
 ReactionCore.Schemas.BraintreePayment = new SimpleSchema({
   payerName: {
     type: String,
-    label: "Cardholder name",
+    //label: "Cardholder name",
+    label: function() {
+      if(Meteor.isClient || Meteor.isCordova) {
+        return(i18next.t('checkoutPayment.payerName'));
+      } else {
+        return('Cardholder name');
+      }
+    },
     regEx: /^\w+\s\w+$/
   },
   cardNumber: {
     type: String,
     min: 16,
-    label: "Card number"
+    max: 19,
+    label: function() {
+      if(Meteor.isClient || Meteor.isCordova) {
+        return(i18next.t('checkoutPayment.cardNumber'));
+      } else {
+        return('Card number');
+      }
+    }
   },
   expireMonth: {
     type: String,
     max: 2,
-    label: "Expiration month"
+    label: function() {
+      if(Meteor.isClient || Meteor.isCordova) {
+        return(i18next.t('checkoutPayment.expireMonth'));
+      } else {
+        return('Expiration month');
+      }
+    }
   },
   expireYear: {
     type: String,
     max: 4,
-    label: "Expiration year"
+    label: function() {
+      if(Meteor.isClient || Meteor.isCordova) {
+        return(i18next.t('checkoutPayment.expireYear'));
+      } else {
+        return('Expiration year');
+      }
+    }
   },
   cvv: {
     type: String,
     max: 4,
-    label: "CVV"
+    label: function() {
+      if(Meteor.isClient || Meteor.isCordova) {
+        return(i18next.t('checkoutPayment.cvv'));
+      } else {
+        return('CVV');
+      }
+    }
   }
 });
 
 
 ReactionCore.Schemas.BraintreePayment.messages({
-  "regEx payerName": "[label] must include both first and last name"
+  "regEx payerName": "[label] muss Vor- und Nachnamen beinhalten und exakt so geschrieben werden wie auf der Kreditkarte"
 });

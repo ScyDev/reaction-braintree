@@ -14,7 +14,6 @@ getGateway = function () {
   return gateway;
 };
 
-
 Meteor.methods({
   /**
    * braintreeSubmit

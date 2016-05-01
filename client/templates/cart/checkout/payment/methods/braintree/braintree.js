@@ -14,12 +14,24 @@ hidePaymentAlert = function () {
   return $(".alert").addClass("hidden").text("");
 };
 
-handleBraintreeSubmitError = function (error) {
+handleBraintreeSubmitError = function (error, results) {
   let serverError = error !== null ? error.message : void 0;
   if (serverError) {
     return paymentAlert("Server Error " + serverError);
   } else if (error) {
-    return paymentAlert("Oops " + error);
+    try {
+      let errorList = results.response.errors.errorCollections.transaction.errorCollections.creditCard.validationErrors.number;
+      if(errorList != undefined && errorList.length > 0) {
+        error = "";
+        for(let singleError in errorList) {
+          error = error + i18next.t("checkoutPayment.braintreeErrors." + errorList[singleError].code, errorList[singleError].message) + " ";
+        }
+      }
+    }
+    catch (err) {
+      error = results.response.message;
+    }
+    return paymentAlert(error);
   }
 };
 
@@ -45,7 +57,7 @@ submitToBrainTree = function (doc, template) {
         );
 
         //handleBraintreeSubmitError(error);
-        uiEnd(template, "Resubmit payment");
+        uiEnd(template, i18next.t("checkoutPayment.resubmitPayment", "Resubmit payment"));
 
         return;
       }
@@ -74,8 +86,8 @@ submitToBrainTree = function (doc, template) {
             submitting = false;
             if (error) {
               console.log("Braintree failed: %o", error);
-              handleBraintreeSubmitError(error);
-              uiEnd(template, "Resubmit payment");
+              handleBraintreeSubmitError(error, results);
+              uiEnd(template, i18next.t("checkoutPayment.resubmitPayment", "Resubmit payment"));
             } else {
 
               if (results.saved === true) {
@@ -98,8 +110,8 @@ submitToBrainTree = function (doc, template) {
                 Meteor.call("cart/submitPayment", paymentMethod);
               } else {
                 console.log("Braintree failed: %o", results);
-                handleBraintreeSubmitError(results.response.message);
-                uiEnd(template, "Resubmit payment");
+                handleBraintreeSubmitError(results.response.message, results);
+                uiEnd(template, i18next.t("checkoutPayment.resubmitPayment", "Resubmit payment"));
               }
             }
           });
@@ -109,6 +121,15 @@ submitToBrainTree = function (doc, template) {
 
 };
 
+Template.braintreePaymentForm.onCreated(() => {
+  for(var key in SimpleSchema._globalMessages) {
+    if(key != "regEx") {
+      //console.log(SimpleSchema._globalMessages[key]);
+      SimpleSchema._globalMessages[key] = i18next.t("globalMessages." + key, SimpleSchema._globalMessages[key]);
+    }
+  }
+});
+
 AutoForm.addHooks("braintree-payment-form", {
   onSubmit: function (doc) {
     submitToBrainTree(doc, this.template);
@@ -116,12 +137,12 @@ AutoForm.addHooks("braintree-payment-form", {
   },
   beginSubmit: function () {
     this.template.$(":input").attr("disabled", true);
-    this.template.$("#btn-complete-order").text("Submitting ");
+    this.template.$("#btn-complete-order").text(i18next.t("checkoutPayment.submitting", "Submitting"));
     return this.template.$("#btn-processing").removeClass("hidden");
   },
   endSubmit: function () {
     if (!submitting) {
-      return uiEnd(this.template, "Complete your order");
+      return uiEnd(this.template, i18next.t("checkoutPayment.completeYourOrder", "Complete your order"));
     }
   }
 });

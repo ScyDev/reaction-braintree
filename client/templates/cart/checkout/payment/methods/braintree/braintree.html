@@ -11,7 +11,7 @@
 
     <div class="col-sm-12 col-lg-6 form-group{{#if afFieldIsInvalid name='cardNumber'}} has-error{{/if}}">
       <label class="control-label">{{afFieldLabelText name='cardNumber'}}</label>
-      {{>afFieldInput name="cardNumber" placeholder='XXXX XXXX XXXX XXXX'}}
+      {{>afFieldInput name="cardNumber" placeholder='XXXX XXXX XXXX XXXX' autocomplete="off"}}
       {{#if afFieldIsInvalid name="cardNumber"}}
       <span class="help-block">{{afFieldMessage name="cardNumber"}}</span>
       {{/if}}
@@ -36,7 +36,7 @@
 
     <div class="col-sm-12 col-lg-3 form-group{{#if afFieldIsInvalid name='cvv'}} has-error{{/if}}">
       <label class="control-label">{{afFieldLabelText name='cvv'}}</label>
-      {{>afFieldInput name="cvv" placeholder="CVV"}}
+      {{>afFieldInput name="cvv" placeholder="CVV" autocomplete="off"}}
       {{#if afFieldIsInvalid name="cvv"}}
       <span class="help-block">{{afFieldMessage name="cvv"}}</span>
       {{/if}}
