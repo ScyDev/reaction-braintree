@@ -14,18 +14,34 @@ hidePaymentAlert = function () {
   return $(".alert").addClass("hidden").text("");
 };
 
+function checkNested(obj /*, level1, level2, ... levelN*/) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  for (var i = 0; i < args.length; i++) {
+    if (!obj || !obj.hasOwnProperty(args[i])) {
+      return false;
+    }
+    obj = obj[args[i]];
+  }
+  return true;
+}
+
 handleBraintreeSubmitError = function (error, results) {
   let serverError = error !== null ? error.message : void 0;
   if (serverError) {
     return paymentAlert("Server Error " + serverError);
   } else if (error) {
     try {
-      let errorList = results.response.errors.errorCollections.transaction.errorCollections.creditCard.validationErrors.number;
-      if(errorList != undefined && errorList.length > 0) {
-        error = "";
-        for(let singleError in errorList) {
-          error = error + i18next.t("checkoutPayment.braintreeErrors." + errorList[singleError].code, errorList[singleError].message) + " ";
+      if(checkNested(results, 'response', 'errors', 'errorCollections', 'transaction', 'errorCollections', 'creditCard', 'validationErrors', 'number')) {
+        let errorList = results.response.errors.errorCollections.transaction.errorCollections.creditCard.validationErrors.number;
+        if(typeof errorList != undefined && errorList.length > 0) {
+          error = "";
+          for(let singleError in errorList) {
+            error = error + i18next.t("checkoutPayment.braintreeErrors." + errorList[singleError].code, errorList[singleError].message) + " ";
+          }
         }
+      }
+      else if(checkNested(results, 'response', 'transaction', 'proccessorResponseCode')) {
+        error = i18next.t("checkoutPayment.braintreeErrors.processorResponse." + results.response.transaction.proccessorResponseCode, results.response.message);
       }
     }
     catch (err) {
