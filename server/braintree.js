@@ -29,7 +29,7 @@ Meteor.methods({
     Object.assign(cardDataCopy, cardData);
     cardDataCopy.number = cardDataCopy.number.substring(0, 4)+"XXXXXXXXXXXX";
     cardDataCopy.cvv2 = "XXX";
-    ReactionCore.Log.info("braintreeSubmit: ",transactionType, " ",cardDataCopy, " ", paymentData);
+    ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId(),transactionType, " ",cardDataCopy, " ", paymentData);
 
     check(transactionType, String);
     check(cardData, {
