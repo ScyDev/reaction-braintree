@@ -25,7 +25,11 @@ Meteor.methods({
    * @return {Object} results - Object containing the results of the transaction
    */
   "braintreeSubmit": function (transactionType, cardData, paymentData) {
-    ReactionCore.Log.info("braintreeSubmit: ",transactionType, " ", paymentData);
+    let cardDataCopy = {};
+    Object.assign(cardDataCopy, cardData);
+    cardDataCopy.number = cardDataCopy.number.substring(0, 4)+"XXXXXXXXXXXX";
+    cardDataCopy.cvv2 = "XXX";
+    ReactionCore.Log.info("braintreeSubmit: ",transactionType, " ",cardDataCopy, " ", paymentData);
 
     check(transactionType, String);
     check(cardData, {
