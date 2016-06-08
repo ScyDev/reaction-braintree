@@ -58,18 +58,76 @@ submitToBrainTree = function (doc, template) {
   let cart = ReactionCore.Collections.Cart.findOne();
   console.log("cart: ",cart);
 
+  let account = ReactionCore.Collections.Accounts.findOne({_id: Meteor.userId()});
+  if (account == null || account.profile == null || account.profile.addressBook == null || account.profile.addressBook.length < 1) {
+    Alerts.alert({
+        title: i18next.t("accountsUI.error.noAddress", "No address"),
+        text: i18next.t("accountsUI.error.youNeedToEnterYourAddress", "You need to enter your address."),
+        type: "error",
+      },
+      function() {
+        // ...
+      }
+    );
+
+    return false;
+  }
+
+  // ############### TTTTESTING!!!!!!!! #############
+  //console.log("deleting cart ");
+  //Meteor.call("cart/deleteCart", cart._id, Session.get("sessionId"));
+  //let account = ReactionCore.Collections.Accounts.findOne({_id: Meteor.userId()});
+  //ReactionCore.Collections.Accounts.update({_id: Meteor.userId()}, {$set: {"profile.addressBook": [] } });
+  //Meteor.call("cart/deleteCartAdresses", cart._id, Session.get("sessionId"));
+
+  if (!cart.shipping || cart.shipping.length < 1
+      || !cart.billing || cart.billing.length < 1 ) {
+    /*
+    Alerts.alert({
+        title: i18next.t("order.cartMissingAddress", "Cart is missing an address"),
+        text: i18next.t("order.cartMissingAddressText", "Something went wrong at our end."),
+        type: "error",
+      },
+      function() {
+        // ...
+      }
+    );*/
+
+    Alerts.alert({
+        title: i18next.t("accountsUI.error.noAddress", "No address"),
+        text: i18next.t("accountsUI.error.youNeedToEnterYourAddress", "You need to enter your address."),
+        type: "error",
+      },
+      function() {
+        // ...
+      }
+    );
+
+    // delete cart
+    /*
+    console.log("deleting cart ");
+    let account = ReactionCore.Collections.Accounts.findOne({_id: Meteor.userId()});
+    ReactionCore.Collections.Accounts.update({_id: Meteor.userId()}, {$set: {"profile.addressBook": [] } });
+    //if (!account.profile.addressBook || account.profile.addressBook.length < 1) {
+    //Meteor.call("cart/deleteCart", cart._id, Session.get("sessionId"));
+    Meteor.call("cart/deleteCartAdresses", cart._id, Session.get("sessionId"));
+    */
+
+    return false;
+  }
+
   Meteor.call("cart/checkInventoryQuantity", cart._id, function(error, result) {
       if (error) {
         console.log("error from cart/checkInventoryQuantity:",error);
 
         Alerts.alert({
-          title: i18next.t("order.outOfStock", "No longer available"),
-          text: i18next.t("order.productInventoryHasChanged", "We're sorry. Somebody bought this product while you were shopping."),
-          type: "warning",
-        },
-        function() {
-          // ...
-        }
+            title: i18next.t("order.outOfStock", "No longer available"),
+            text: i18next.t("order.productInventoryHasChanged", "We're sorry. Somebody bought this product while you were shopping."),
+            type: "warning",
+          },
+          function() {
+            // ...
+          }
         );
 
         //handleBraintreeSubmitError(error);
