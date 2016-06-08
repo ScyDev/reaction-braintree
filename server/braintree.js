@@ -51,26 +51,59 @@ Meteor.methods({
     }
     paymentObj.creditCard = Meteor.Braintree.parseCardData(cardData);
     paymentObj.amount = paymentData.total;
+
     let fut = new Future();
     this.unblock();
+
+    // check if cart has addresses
+    let cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId() });
+    if (cart == null || cart.shipping == null || cart.shipping.length < 1
+        || cart.billing == null || cart.billing.length < 1 ) {
+          ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId()," cart has no address before payment! ",account);
+
+          fut.return({
+            saved: false,
+            error: "cart has no address before payment"
+          });
+    }
+
+    // check if user has address
+    let account = ReactionCore.Collections.Accounts.findOne({_id: Meteor.userId()});
+    if (account == null || account.profile.addressBook == null || account.profile.addressBook.length < 1) {
+      ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId()," user has no address before payment! ",account);
+
+      fut.return({
+        saved: false,
+        error: "user has no address before payment"
+      });
+    }
+
     gateway.transaction.sale(paymentObj, Meteor.bindEnvironment(function (error, result) {
       if (error) {
+        ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId()," error from gateway ",error);
+
         fut.return({
           saved: false,
           error: error
         });
       } else if (!result.success) {
+        ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId()," fail ",result);
+
         fut.return({
           saved: false,
           response: result
         });
       } else {
+        ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId()," success ",result);
+
         fut.return({
           saved: true,
           response: result
         });
       }
     }, function (error) {
+      ReactionCore.Log.info("braintreeSubmit: userId ",Meteor.userId()," error on call ",error);
+
       ReactionCore.Events.warn(error);
     }));
     return fut.wait();
